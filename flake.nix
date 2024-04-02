@@ -35,15 +35,14 @@
         defaultPackage = naersk-lib.buildPackage {
           src = ./.;
           buildInputs = with pkgs; [
-            pkg-config
-            openssl
+
           ];
         };
 
         devShell = with pkgs; mkShell {
           buildInputs = [
             go
-            npm
+            nodejs
           ];
         };
 
