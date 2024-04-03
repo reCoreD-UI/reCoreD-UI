@@ -4,33 +4,8 @@ import (
 	"fmt"
 	"reCoreD-UI/models"
 
-	dns "github.com/cloud66-oss/coredns_mysql"
-
 	"gorm.io/gorm"
 )
-
-func (c *Controller) SetupNSRecord(domain *models.Domain) error {
-	nss, err := c.GetDNS()
-	if err != nil {
-		return err
-	}
-
-	return c.DB.Transaction(func(tx *gorm.DB) error {
-		for i, ns := range nss {
-			record := &models.RecordWithType[dns.NSRecord]{}
-			record.Zone = domain.DomainName
-			record.RecordType = models.RecordTypeNS
-			record.Content.Host = ns
-			record.Name = fmt.Sprintf("ns%d", i+1)
-
-			if err := tx.Create(record.ToRecord()).Error; err != nil {
-				return err
-			}
-		}
-
-		return nil
-	})
-}
 
 func (c *Controller) CreateRecord(r *models.Record) error {
 	if r.RecordType != models.RecordTypeSOA {
@@ -60,7 +35,7 @@ func (c *Controller) CreateRecords(rs []*models.Record) error {
 	})
 }
 
-func (c *Controller) GetRecords(cond map[string]any) ([]models.Record, error) {
+func (c *Controller) GetRecords(cond map[string]string) ([]models.Record, error) {
 	var records []models.Record
 
 	if err := c.DB.Where(cond).Find(&records).Error; err != nil {
@@ -76,8 +51,11 @@ func (c *Controller) UpdateRecord(r *models.Record) error {
 	})
 }
 
-func (c *Controller) DeleteRecord(id string) error {
+func (c *Controller) DeleteRecord(domain, id string) error {
 	return c.DB.Transaction(func(tx *gorm.DB) error {
-		return tx.Where("record_type != ?", models.RecordTypeSOA).Where("id = ?", id).Delete(&models.Record{}).Error
+		return tx.Where("record_type != ?", models.RecordTypeSOA).
+			Where("id = ?", id).
+			Where("zone = ?", domain).
+			Delete(&models.Record{}).Error
 	})
 }

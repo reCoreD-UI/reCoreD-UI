@@ -8,20 +8,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type Response struct {
-	Succeed bool        `json:"succeed"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
-}
-
-func errorHandler(c *gin.Context, err error) {
-	c.JSON(http.StatusInternalServerError, Response{
-		Succeed: false,
-		Message: err.Error(),
-		Data:    nil,
-	})
-}
-
 func (s *Server) getDomains(c *gin.Context) {
 	domains, err := s.controller.GetDomains("")
 	if err != nil {

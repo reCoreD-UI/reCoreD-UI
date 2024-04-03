@@ -30,7 +30,11 @@ func (s *Server) setupRoute() {
 
 	records := groupV1.Group("/records")
 	records.
-		GET("/")
+		GET("/:domain", s.getRecords).
+		POST("/:domain", s.createRecord).
+		POST("/:domain/bulk", s.createRecords).
+		PUT("/:domain", s.updateRecord).
+		DELETE("/:domain/:id", s.deleteRecord)
 
 	server.Use(func(ctx *gin.Context) {
 		uri := ctx.Request.RequestURI

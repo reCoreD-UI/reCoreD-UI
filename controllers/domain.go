@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"reCoreD-UI/models"
 	"strconv"
 
@@ -10,6 +11,11 @@ import (
 )
 
 func (c *Controller) CreateDomain(d *models.Domain) error {
+	nss, err := c.GetDNS()
+	if err != nil {
+		return err
+	}
+
 	return c.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(d).Error; err != nil {
 			return err
@@ -28,6 +34,18 @@ func (c *Controller) CreateDomain(d *models.Domain) error {
 
 		if err := tx.Create(r.ToRecord()).Error; err != nil {
 			return err
+		}
+
+		for i, ns := range nss {
+			record := &models.RecordWithType[dns.NSRecord]{}
+			record.Zone = d.DomainName
+			record.RecordType = models.RecordTypeNS
+			record.Content.Host = ns
+			record.Name = fmt.Sprintf("ns%d", i+1)
+
+			if err := tx.Create(record.ToRecord()).Error; err != nil {
+				return err
+			}
 		}
 
 		return nil
