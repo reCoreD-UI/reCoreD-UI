@@ -44,6 +44,7 @@
             go
             nodejs
           ];
+          GOPATH = "/home/coder/.cache/go";
         };
 
         nixosModule = { config, pkgs, lib, ... }: with lib;
