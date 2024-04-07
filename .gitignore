@@ -33,5 +33,6 @@ docs/_book
 test/
 
 node_modules/
+dist/
 
 .direnv

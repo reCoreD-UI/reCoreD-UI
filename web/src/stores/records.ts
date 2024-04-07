@@ -1,3 +1,4 @@
+import api from '@/apis/api';
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
@@ -197,33 +198,35 @@ export const useRecordStore = defineStore('records', () => {
     const records = ref<Record[] | undefined>([])
     const recordsGetter = computed(() => records.value)
 
-    function loadRecords(domain: string) {
+    async function loadRecords(domain: string) {
         // TODO: load from api
-        records.value = import.meta.env.DEV ? recordDevData.get(domain) : []
+        records.value = import.meta.env.DEV ?
+            recordDevData.get(domain) :
+            (await api.get<Record[]>(`/records/${domain}`)).data.data
     }
 
-    function addRecord(domain: string, record: Record) {
+    async function addRecord(domain: string, record: Record) {
         // TODO: load from api
         if (!import.meta.env.DEV) {
-            //record = 
+            record = (await api.post(`/records/${domain}`, record)).data.data
         }
 
         records.value?.push(record)
     }
 
-    function updateRecord(domain: string, record: Record) {
+    async function updateRecord(domain: string, record: Record) {
         // TODO: load from api
         if (!import.meta.env.DEV) {
-            //record = 
+            await api.put(`/records/${domain}`, record)
         }
 
         records.value = records.value?.map(e => e.id === record.id ? record : e)
     }
 
-    function removeRecord(domain: string, record: Record) {
+    async function removeRecord(domain: string, record: Record) {
         // TODO: load from api
         if (!import.meta.env.DEV) {
-            //record = 
+            await api.delete(`/records/${domain}/${record.id}`)
         }
 
         records.value = records.value?.filter(e => e.id !== record.id)

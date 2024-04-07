@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import api from '@/apis/api'
 
 export type Domain = {
     id: number;
@@ -42,33 +43,35 @@ export const useDomainStore = defineStore('domains', () => {
     const domains = ref<Domain[]>([])
     const domainsGetter = computed(() => domains.value)
 
-    function loadDomains() {
+    async function loadDomains() {
         // TODO: load from api
-        domains.value = import.meta.env.DEV ? domainDevData : []
+        domains.value = import.meta.env.DEV ?
+            domainDevData :
+            (await api.get<Domain[]>('/domains')).data.data
     }
 
-    function addDomain(domain: Domain) {
+    async function addDomain(domain: Domain) {
         // TODO: load from api
         if (!import.meta.env.DEV) {
-            //domain = 
+            domain = (await api.post("/domains", domain)).data.data
         }
 
         domains.value.push(domain)
     }
 
-    function updateDomain(domain: Domain) {
+    async function updateDomain(domain: Domain) {
         // TODO: load from api
         if (!import.meta.env.DEV) {
-            //domain = 
+            await api.put("/domains", domain)
         }
 
         domains.value = domains.value.map(e => e.id === domain.id ? domain : e)
     }
 
-    function removeDomain(domain: Domain) {
+    async function removeDomain(domain: Domain) {
         // TODO: load from api
         if (!import.meta.env.DEV) {
-            //domain = 
+            await api.delete(`/domains/${domain.id}`)
         }
 
         domains.value = domains.value.filter(e => e.id !== domain.id)
