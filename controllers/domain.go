@@ -10,13 +10,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func (c *Controller) CreateDomain(d *models.Domain) error {
+func (c *Controller) CreateDomain(d *models.Domain) (*models.Domain, error) {
 	nss, err := c.GetDNS()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return c.DB.Transaction(func(tx *gorm.DB) error {
+	if err := c.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(d).Error; err != nil {
 			return err
 		}
@@ -49,7 +49,11 @@ func (c *Controller) CreateDomain(d *models.Domain) error {
 		}
 
 		return nil
-	})
+	}); err != nil {
+		return nil, err
+	}
+
+	return d, err
 }
 
 func (c *Controller) GetDomains(domain string) ([]models.Domain, error) {

@@ -31,13 +31,15 @@ func (s *Server) createDomain(c *gin.Context) {
 		return
 	}
 
-	if err := s.controller.CreateDomain(domain); err != nil {
+	domain, err := s.controller.CreateDomain(domain)
+	if err != nil {
 		errorHandler(c, err)
 		return
 	}
 
 	c.JSON(http.StatusCreated, Response{
 		Succeed: true,
+		Data:    domain,
 	})
 }
 

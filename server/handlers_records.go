@@ -50,13 +50,15 @@ func (s *Server) createRecord(c *gin.Context) {
 		return
 	}
 
-	if err := s.controller.CreateRecord(record); err != nil {
+	record, err := s.controller.CreateRecord(record)
+	if  err != nil {
 		errorHandler(c, err)
 		return
 	}
 
 	c.JSON(http.StatusCreated, Response{
 		Succeed: true,
+		Data: record,
 	})
 }
 

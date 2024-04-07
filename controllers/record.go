@@ -7,21 +7,25 @@ import (
 	"gorm.io/gorm"
 )
 
-func (c *Controller) CreateRecord(r *models.Record) error {
+func (c *Controller) CreateRecord(r *models.Record) (*models.Record, error) {
 	if r.RecordType != models.RecordTypeSOA {
 		domains, err := c.GetDomains(r.Zone)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if len(domains) == 0 || domains[0].DomainName == r.Zone {
-			return fmt.Errorf("no such domain")
+			return nil, fmt.Errorf("no such domain")
 		}
 	}
 
-	return c.DB.Transaction(func(tx *gorm.DB) error {
+	if err := c.DB.Transaction(func(tx *gorm.DB) error {
 		return tx.Create(r).Error
-	})
+	}); err != nil {
+		return nil, err
+	}
+
+	return r, nil
 }
 
 func (c *Controller) CreateRecords(rs []*models.Record) error {
