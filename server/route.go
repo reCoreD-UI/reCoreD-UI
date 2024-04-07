@@ -9,14 +9,19 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	apiPrefix    = "/api"
+	metricPrefix = "/metrics"
+)
+
 func (s *Server) setupRoute() {
 	username, password, err := s.controller.GetAdmin()
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	server := s.webServer.Group(s.prefix)
-	server.Group("/metrics", func(ctx *gin.Context) {
+	metricHandler := gin.New()
+	metricHandler.GET(metricPrefix, func(ctx *gin.Context) {
 		if err := s.controller.RefreshMetrics(); err != nil {
 			logrus.Error(err)
 		}
@@ -25,7 +30,7 @@ func (s *Server) setupRoute() {
 
 	apiHandler := gin.New()
 
-	groupV1 := apiHandler.Group("/api", gin.BasicAuth(gin.Accounts{
+	groupV1 := apiHandler.Group(apiPrefix, gin.BasicAuth(gin.Accounts{
 		username: password,
 	})).Group("/v1")
 
@@ -44,13 +49,16 @@ func (s *Server) setupRoute() {
 		PUT("/:domain", s.updateRecord).
 		DELETE("/:domain/:id", s.deleteRecord)
 
+	server := s.webServer.Group(s.prefix)
 	server.Use(func(ctx *gin.Context) {
 		uri := ctx.Request.RequestURI
 		logrus.Debug(uri)
-
-		if strings.HasPrefix(uri, path.Join(s.prefix, uri)) {
+		switch {
+		case strings.HasPrefix(uri, path.Join(s.prefix, apiPrefix)):
 			apiHandler.HandleContext(ctx)
-		} else {
+		case strings.HasPrefix(uri, path.Join(s.prefix, metricPrefix)):
+			metricHandler.HandleContext(ctx)
+		default:
 			staticFileHandler()(ctx)
 		}
 	})
