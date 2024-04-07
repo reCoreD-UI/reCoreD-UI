@@ -5,13 +5,11 @@ import (
 	"reCoreD-UI/models"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 func (s *Server) getDomains(c *gin.Context) {
 	domains, err := s.controller.GetDomains("")
 	if err != nil {
-		logrus.Error(err)
 		errorHandler(c, err)
 		return
 	}

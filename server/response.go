@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type Response struct {
@@ -13,6 +14,7 @@ type Response struct {
 }
 
 func errorHandler(c *gin.Context, err error) {
+	logrus.Error(err)
 	c.JSON(http.StatusInternalServerError, Response{
 		Succeed: false,
 		Message: err.Error(),
