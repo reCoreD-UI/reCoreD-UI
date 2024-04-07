@@ -59,3 +59,23 @@ func (c *Controller) DeleteRecord(domain, id string) error {
 			Delete(&models.Record{}).Error
 	})
 }
+
+func (c *Controller) getRecordCounts() (map[string]float64, error) {
+	rows, err := c.DB.Model(models.Record{}).Select("zone", "count(*) as count").Group("zone").Rows()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make(map[string]float64)
+	for rows.Next() {
+		var domain string
+		var count int64
+		if err := rows.Scan(&domain, &count); err != nil {
+			return nil, err
+		}
+		result[domain] = float64(count)
+	}
+
+	return result, nil
+}

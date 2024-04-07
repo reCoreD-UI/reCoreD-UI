@@ -124,3 +124,11 @@ func (c *Controller) DeleteDomain(id string) error {
 		return nil
 	})
 }
+
+func (c *Controller) getDomainCounts() (float64, error) {
+	var count int64
+	if err := c.DB.Model(models.Domain{}).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return float64(count), nil
+}

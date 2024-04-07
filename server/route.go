@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 )
 
@@ -14,12 +15,19 @@ func (s *Server) setupRoute() {
 		logrus.Fatal(err)
 	}
 
-	server := s.webServer.Group(s.prefix, gin.BasicAuth(gin.Accounts{
-		username: password,
-	}))
+	server := s.webServer.Group(s.prefix)
+	server.Group("/metrics", func(ctx *gin.Context) {
+		if err := s.controller.RefreshMetrics(); err != nil {
+			logrus.Error(err)
+		}
+		promhttp.Handler().ServeHTTP(ctx.Writer, ctx.Request)
+	})
 
 	apiHandler := gin.New()
-	groupV1 := apiHandler.Group("/api/v1")
+
+	groupV1 := apiHandler.Group("/api", gin.BasicAuth(gin.Accounts{
+		username: password,
+	})).Group("/v1")
 
 	domains := groupV1.Group("/domains")
 	domains.
@@ -43,7 +51,7 @@ func (s *Server) setupRoute() {
 		if strings.HasPrefix(uri, path.Join(s.prefix, uri)) {
 			apiHandler.HandleContext(ctx)
 		} else {
-			// TODO: Static Page
+			staticFileHandler()(ctx)
 		}
 	})
 }
