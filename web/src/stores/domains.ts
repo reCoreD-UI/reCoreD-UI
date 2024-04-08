@@ -36,7 +36,7 @@ const domainDevData: Domain[] = [
         retry_interval: 7200,
         expiry_period: 3600000,
         negative_ttl: 86400
-    }
+    },
 ]
 
 export const useDomainStore = defineStore('domains', () => {
