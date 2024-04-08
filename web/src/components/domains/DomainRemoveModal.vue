@@ -25,7 +25,7 @@
                         {{ t('common.cancel') }}
                     </NButton>
                     <NSpin :show="loading">
-                        <NButton size="small" type="error" :disabled="domain_name !== domain?.domain_name"
+                        <NButton size="small" type="error" :disabled="(domain_name !== domain?.domain_name) || loading"
                             @click="confirm">
                             <template #icon>
                                 <NIcon>
@@ -57,7 +57,7 @@ const domainStore = useDomainStore()
 const notification = useNotification()
 
 const props = defineProps<{
-    domain: Domain | undefined
+    domain: Domain
 }>()
 
 async function confirm() {

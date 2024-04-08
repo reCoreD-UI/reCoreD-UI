@@ -7,13 +7,15 @@ import { getErrorInfo } from '@/apis/api'
 import DomainInfo from '@/components/domains/DomainInfo.vue'
 import DomainOps from '@/components/domains/DomainOps.vue'
 import DomainRemoveModal from '@/components/domains/DomainRemoveModal.vue'
+import DomainEditModal from '@/components/domains/DomainEditModal.vue'
 
 const domainStore = useDomainStore()
 const notification = useNotification()
 
 const loading = defineModel<boolean>('loading', { default: true });
 const removeModalShow = defineModel<boolean>('removeModalShow', { default: false })
-const operationDomain = defineModel<Domain|undefined>('operationDomain')
+const editModalShow = defineModel<boolean>('editModalShow', { default: false })
+const operationDomain = defineModel<Domain>('operationDomain', { default: {} as Domain })
 
 onMounted(() => {
     try {
@@ -29,6 +31,16 @@ function showRemoveModal(domain: Domain) {
     operationDomain.value = domain
     removeModalShow.value = true
 }
+
+function showEditModal(domain: Domain) {
+    operationDomain.value = domain
+    editModalShow.value = true
+}
+
+function addDomain() {
+    const domain = {} as Domain
+    showEditModal(domain)
+}
 </script>
 
 <template>
@@ -40,18 +52,19 @@ function showRemoveModal(domain: Domain) {
                     size="large" hoverable>
                     <DomainInfo :domain="domain" />
                     <template #action>
-                        <DomainOps :domain="domain" @remove-domain="showRemoveModal"/>
+                        <DomainOps :domain="domain" @remove-domain="showRemoveModal" @edit-domain="showEditModal" />
                     </template>
                 </NCard>
                 <NCard hoverable>
-                    <NButton block quaternary size="large">
+                    <NButton block quaternary size="large" @click="addDomain">
                         <template #icon>
                             <NIcon :component="PlusSquare" :depth="5" />
                         </template>
                     </NButton>
                 </NCard>
             </NFlex>
-            <DomainRemoveModal v-model:show="removeModalShow" :domain="operationDomain"/>
+            <DomainRemoveModal v-model:show="removeModalShow" :domain="operationDomain" />
+            <DomainEditModal v-model:show="editModalShow" :domain="operationDomain" />
         </NModalProvider>
     </div>
 </template>

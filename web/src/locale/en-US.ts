@@ -9,6 +9,7 @@ export default {
         new: 'New',
         cancel: 'Cancel',
         confirm: 'OK',
+        mandatory: 'This field is mandatory'
     },
     api: {
         error400: {
@@ -37,13 +38,26 @@ export default {
         }
     },
     domains: {
+        '_': 'Domain',
         dnsRecord: 'DNS Record',
         delete: 'Remove Domain',
         deleteHint: 'All records of this domain will be WIPED!',
         confirm1: 'Please input',
-        confirm2: 'for comfirmation'
+        confirm2: 'for comfirmation',
+
+        form: {
+            adminMail: 'Admin Email',
+            mainDNS: 'Main DNS',
+            unitForSecond: 'Second(s)'
+        },
+
+        errors: {
+            domainName: 'Invalid domain name',
+            mail: 'Invalid email',
+        }
     },
     records: {
+        '_': 'Record',
         name: 'Record Name',
         recordType: 'Type',
         content: 'Record',

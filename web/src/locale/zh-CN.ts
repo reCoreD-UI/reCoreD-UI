@@ -9,6 +9,7 @@ export default {
         new: '新增',
         cancel: '取消',
         confirm: '确定',
+        mandatory: '此项必填'
     },
     api: {
         error400: {
@@ -37,13 +38,26 @@ export default {
         }
     },
     domains: {
+        '_': '域名',
         dnsRecord: 'DNS 记录',
         delete: '删除域名',
         deleteHint: '该域名所有记录将被删除！',
         confirm1: '请输入',
-        confirm2: '以确认要删除的域名'
+        confirm2: '以确认要删除的域名',
+
+        form: {
+            adminMail: '管理员邮箱',
+            mainDNS: '主 DNS 服务器',
+            unitForSecond: '秒'
+        },
+
+        errors: {
+            domainName: '这不是一个有效的域名',
+            mail: '这不是一个有效的邮箱',
+        }
     },
     records: {
+        '_': '记录',
         name: '记录名',
         recordType: '类型',
         content: '记录值',
