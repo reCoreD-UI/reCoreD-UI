@@ -8,12 +8,19 @@ import {
   lightTheme,
   type GlobalTheme
 } from "naive-ui";
+import { zhCN, dateZhCN, enUS, dateEnUS, type NLocale, type NDateLocale } from 'naive-ui'
 import { RouterView } from "vue-router";
 import { onMounted } from "vue";
 
 const osThemeRef = useOsTheme()
-const theme = defineModel<GlobalTheme>()
+const theme = defineModel<GlobalTheme>('theme')
 theme.value = osThemeRef.value === 'dark' ? darkTheme : lightTheme
+
+const locale = defineModel<NLocale>('locale')
+locale.value = navigator.language === "zh-CN" ? zhCN : enUS
+
+const dateLocale = defineModel<NDateLocale>('dateLocale')
+dateLocale.value = navigator.language === "zh-CN" ? dateZhCN : dateEnUS
 
 onMounted(() => {
   document.title = 'reCoreD-UI'
@@ -21,7 +28,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <NConfigProvider :theme="theme">
+  <NConfigProvider :theme="theme" :locale="locale" :date-locale="dateLocale">
     <NGlobalStyle />
     <NNotificationProvider :max="3">
       <RouterView />

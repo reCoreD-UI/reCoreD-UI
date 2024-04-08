@@ -1,18 +1,58 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import { NSpin, NPageHeader, useNotification, NFlex, NButton, NIcon, NGrid, NGi, NStatistic, NDataTable, NInput } from 'naive-ui'
-import { onMounted } from 'vue'
+import type { DataTableColumns, DataTableFilterState } from 'naive-ui'
+import { onMounted, ref } from 'vue'
 import { useRecordStore, type Record, type SOARecord, RecordTypes } from '@/stores/records'
 import { getErrorInfo } from '@/apis/api'
 import { PlusSquare, RedoAlt, CheckCircle, Clock, Cogs, Search } from '@vicons/fa'
 import router from '@/router';
+import RecordOps from '@/components/records/RecordOps.vue'
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n()
 
 const props = defineProps<{
     domain: string
 }>()
 const loading = defineModel<boolean>('loading', { default: true });
 const records = defineModel<Record[]>('records');
-const search = defineModel<string>('search', { default: '' })
 const soa = defineModel<SOARecord | undefined>('soa')
+const columns = defineModel<DataTableColumns<Record>>('columns')
+const table = ref<any>(null)
+
+columns.value = [
+    {
+        key: 'no',
+        title: '#',
+        render(_, index) {
+            return index + 1
+        }
+    },
+    {
+        key: 'name',
+        title: t("records.name"),
+    },
+    {
+        key: 'record_type',
+        title: t('records.recordType')
+    },
+    {
+        key: 'content',
+        title: t('records.content'),
+        render(row: Record) {
+            return Object.entries(row.content).map(i => i[1]).join(" ")
+        }
+    },
+    {
+        key: 'ttl',
+        title: 'TTL (s)'
+    },
+    {
+        key: '',
+        render(row: Record) {
+            return <RecordOps record={ row } />
+        }
+    }
+]
 
 const recordStore = useRecordStore()
 const notification = useNotification()
@@ -27,100 +67,120 @@ onMounted(() => {
 
 function refreshRecords() {
     recordStore.loadRecords(props.domain)
-    records.value = recordStore.records
-    soa.value = records.value?.find(e => e.record_type === RecordTypes.RecordTypeSOA)?.content as SOARecord
+    records.value = recordStore.records?.filter(e => e.record_type !== RecordTypes.RecordTypeSOA)
+    soa.value = recordStore.records?.find(e => e.record_type === RecordTypes.RecordTypeSOA)?.content as SOARecord
     loading.value = false;
 }
 
 function goBack() {
     router.push('/domains')
 }
+
+function searchRecord(value: string) {
+    if (value.length > 0) {
+        records.value = recordStore.records?.
+            filter(e => e.record_type !== RecordTypes.RecordTypeSOA).
+            filter(e => !!~e.name.indexOf(value))
+    } else {
+        records.value = recordStore.records?.
+            filter(e => e.record_type !== RecordTypes.RecordTypeSOA)
+    }
+}
 </script>
 
 <template>
     <div id="records">
         <NSpin size="large" v-if="loading" />
-        <NPageHeader v-else title="DNS 记录" :subtitle="domain" @back="goBack">
-            <template #extra>
-                <NFlex :wrap="false" justify="end" inline>
-                    <NButton type="primary">
-                        <template #icon>
-                            <NIcon>
-                                <PlusSquare />
-                            </NIcon>
-                        </template>
-                        新增
-                    </NButton>
-                    <NInput v-model:value="search" placeholder="搜索...">
-                    <template #prefix>
-                        <NIcon :component="Search" />
-                    </template>
-                    </NInput>
-                </NFlex>
-            </template>
-            <NGrid :cols="4">
-                <NGi>
-                    <NStatistic :value="soa?.refresh">
-                        <template #suffix>
-                            s
-                        </template>
-                        <template #label>
-                            <NIcon class="icon">
-                                <RedoAlt />
-                            </NIcon>
-                            刷新时间
-                        </template>
-                    </NStatistic>
-                </NGi>
-                <NGi>
-                    <NStatistic :value="soa?.retry">
-                        <template #suffix>
-                            s
-                        </template>
-                        <template #label>
-                            <NIcon class="icon">
-                                <CheckCircle />
-                            </NIcon>
-                            重试间隔
-                        </template>
-                    </NStatistic>
-                </NGi>
-                <NGi>
-                    <NStatistic :value="soa?.expire">
-                        <template #suffix>
-                            s
-                        </template>
-                        <template #label>
-                            <NIcon class="icon">
-                                <Clock />
-                            </NIcon>
-                            超期时间
-                        </template>
-                    </NStatistic>
-                </NGi>
-                <NGi>
-                    <NStatistic :value="soa?.minttl">
-                        <template #suffix>
-                            s
-                        </template>
-                        <template #label>
-                            <NIcon class="icon">
-                                <Cogs />
-                            </NIcon>
-                            缓存时间
-                        </template>
-                    </NStatistic>
-                </NGi>
-            </NGrid>
-        </NPageHeader>
-        <NDataTable :data="records">
-
-        </NDataTable>
+        <div v-else class="content">
+            <NPageHeader :title="t('domains.dnsRecord')" :subtitle="domain" @back="goBack">
+                <template #extra>
+                    <NFlex :wrap="false" justify="end" inline>
+                        <NButton type="primary">
+                            <template #icon>
+                                <NIcon>
+                                    <PlusSquare />
+                                </NIcon>
+                            </template>
+                            {{ t('common.add') }}
+                        </NButton>
+                        <NInput :placeholder="t('records.search')" @update:value="searchRecord" clearable>
+                            <template #prefix>
+                                <NIcon :component="Search" />
+                            </template>
+                        </NInput>
+                    </NFlex>
+                </template>
+                <NGrid :cols="4">
+                    <NGi>
+                        <NStatistic :value="soa?.refresh">
+                            <template #suffix>
+                                s
+                            </template>
+                            <template #label>
+                                <NIcon class="icon">
+                                    <RedoAlt />
+                                </NIcon>
+                                {{ t('records.refresh') }}
+                            </template>
+                        </NStatistic>
+                    </NGi>
+                    <NGi>
+                        <NStatistic :value="soa?.retry">
+                            <template #suffix>
+                                s
+                            </template>
+                            <template #label>
+                                <NIcon class="icon">
+                                    <CheckCircle />
+                                </NIcon>
+                                {{ t('records.retry') }}
+                            </template>
+                        </NStatistic>
+                    </NGi>
+                    <NGi>
+                        <NStatistic :value="soa?.expire">
+                            <template #suffix>
+                                s
+                            </template>
+                            <template #label>
+                                <NIcon class="icon">
+                                    <Clock />
+                                </NIcon>
+                                {{ t('records.expire') }}
+                            </template>
+                        </NStatistic>
+                    </NGi>
+                    <NGi>
+                        <NStatistic :value="soa?.minttl">
+                            <template #suffix>
+                                s
+                            </template>
+                            <template #label>
+                                <NIcon class="icon">
+                                    <Cogs />
+                                </NIcon>
+                                {{ t('records.ttl') }}
+                            </template>
+                        </NStatistic>
+                    </NGi>
+                </NGrid>
+            </NPageHeader>
+            <br />
+            <NDataTable :data="records" :columns="columns" ref="table" :pagination="{ pageSize: 20 }" />
+        </div>
     </div>
 </template>
 
 <style scoped>
 .icon {
     transform: translateY(2px);
+}
+
+div#records {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    padding: 1.5rem;
 }
 </style>

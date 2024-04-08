@@ -5,6 +5,7 @@
   margin: 0 auto;
   padding: 2rem;
   font-weight: normal;
+  display: block;
 }
 
 a,
@@ -29,7 +30,6 @@ a,
 
   #app {
     display: flex;
-    grid-template-columns: 1fr;
     padding: 2rem 2rem;
   }
 }

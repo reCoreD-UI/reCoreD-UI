@@ -2,6 +2,8 @@ import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse,
 import { type Record } from '@/stores/records';
 import { type Domain } from "@/stores/domains";
 
+import i18n from "@/locale/i18n";
+
 type Result<T> = {
     success: boolean
     message: string
@@ -13,31 +15,30 @@ const notificationDuration = 5000
 const messages = new Map<number, {
     title: string, content: string, duration: number
 }>(
-    // TODO: i18n
     [
         [400, {
-            title: "请求错误 (400)",
-            content: "参数提交错误",
+            title: i18n.global.t("api.error400.title"),
+            content: i18n.global.t("api.error400.content"),
             duration: notificationDuration
         }],
         [401, {
-            title: "未授权 (401)",
-            content: "请刷新页面重新登录",
+            title: i18n.global.t("api.error401.title"),
+            content: i18n.global.t("api.error401.content"),
             duration: notificationDuration
         }],
         [403, {
-            title: "拒绝访问 (403)",
-            content: "你没有权限！",
+            title: i18n.global.t("api.error403.title"),
+            content: i18n.global.t("api.error403.content"),
             duration: notificationDuration
         }],
         [404, {
-            title: "查无此项 (404)",
-            content: "没有该项内容",
+            title: i18n.global.t("api.error404.title"),
+            content: i18n.global.t("api.error404.content"),
             duration: notificationDuration
         }],
         [500, {
-            title: "服务器错误 (500)",
-            content: "请检查系统日志",
+            title: i18n.global.t("api.error500.title"),
+            content: i18n.global.t("api.error500.content"),
             duration: notificationDuration
         }]
     ]
@@ -46,8 +47,8 @@ const messages = new Map<number, {
 export function getErrorInfo(err: any)  {
     const msg = messages.get(err.response.status)
     return msg? msg: {
-        title: "未知错误",
-        content: "请打开控制台了解详情",
+        title: i18n.global.t("api.errorUnknown.title"),
+        content: i18n.global.t("api.errorUnknown.content"),
         duration: notificationDuration
     }
 }
