@@ -1,9 +1,8 @@
 - [x] metrics
 - [] Web UI
-  - [] i18n
+  - [x] i18n
+  - [] modals
 - [] swagger
 - [] Nix Module
 - [] RBAC
 - [] Audit
-
-

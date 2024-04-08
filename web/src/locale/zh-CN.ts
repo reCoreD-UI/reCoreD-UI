@@ -7,6 +7,8 @@ export default {
         edit: '修改',
         add: '新增',
         new: '新增',
+        cancel: '取消',
+        confirm: '确定',
     },
     api: {
         error400: {
@@ -35,7 +37,11 @@ export default {
         }
     },
     domains: {
-        dnsRecord: 'DNS 记录'
+        dnsRecord: 'DNS 记录',
+        delete: '删除域名',
+        deleteHint: '该域名所有记录将被删除！',
+        confirm1: '请输入',
+        confirm2: '以确认要删除的域名'
     },
     records: {
         name: '记录名',

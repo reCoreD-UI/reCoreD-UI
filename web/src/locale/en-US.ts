@@ -7,6 +7,8 @@ export default {
         edit: 'Edit',
         add: 'New',
         new: 'New',
+        cancel: 'Cancel',
+        confirm: 'OK',
     },
     api: {
         error400: {
@@ -35,7 +37,11 @@ export default {
         }
     },
     domains: {
-        dnsRecord: 'DNS Record'
+        dnsRecord: 'DNS Record',
+        delete: 'Remove Domain',
+        deleteHint: 'All records of this domain will be WIPED!',
+        confirm1: 'Please input',
+        confirm2: 'for comfirmation'
     },
     records: {
         name: 'Record Name',

@@ -9,27 +9,27 @@
                         </template>
                     </NButton>
                 </template>
-                查看/修改记录
+                {{ t('domains.dnsRecord') }}
             </NTooltip>
             <NTooltip trigger="hover">
                 <template #trigger>
                     <NButton size="tiny">
                         <template #icon>
-                            <NIcon :component="EditRegular" />
+                            <NIcon :component="EditRegular" @click="editDomain" />
                         </template>
                     </NButton>
                 </template>
-                修改
+                {{ t('common.edit') }}
             </NTooltip>
             <NTooltip trigger="hover">
                 <template #trigger>
                     <NButton type="error" size="tiny">
                         <template #icon>
-                            <NIcon :component="TrashAlt" />
+                            <NIcon :component="TrashAlt" @click="removeDomain"/>
                         </template>
                     </NButton>
                 </template>
-                删除
+                {{ t('common.delete') }}
             </NTooltip>
         </NFlex>
     </div>
@@ -40,12 +40,24 @@ import { NSpace, NButton, NIcon, NTooltip, NFlex } from 'naive-ui'
 import { TrashAlt, EditRegular, Book } from '@vicons/fa'
 import { type Domain } from "../../stores/domains"
 import router from '@/router';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n()
 
 const props = defineProps<{
     domain: Domain
 }>()
 
+const emit = defineEmits(['remove-domain', 'edit-domain'])
+
 function loadRecord() {
     router.push(`/records/${props.domain.domain_name}`)
+}
+
+function removeDomain() {
+    emit('remove-domain', props.domain)
+}
+
+function editDomain() {
+    emit('edit-domain', props.domain)
 }
 </script>

@@ -2,3 +2,5 @@
 import router from '@/router';
 router.push("/domains")
 </script>
+
+<template></template>
