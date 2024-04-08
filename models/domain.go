@@ -17,6 +17,7 @@ type Domain struct {
 }
 
 func (d *Domain) EmailSOAForamt() string {
-	soa := strings.Replace(d.AdminEmail, ".", "\\", 1)
-	return strings.Replace(soa, "@", ".", 1)
+	s := strings.Split(d.AdminEmail, "@")
+	s[0] = strings.Replace(s[0], ".", "\\", -1)
+	return strings.Join(s, ".")
 }
