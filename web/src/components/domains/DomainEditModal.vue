@@ -4,7 +4,7 @@
             <template #header>
                 <span v-if="!domain || !domain.id || domain.id < 1">{{ t('common.new') }}</span><span v-else>{{
                     t('common.edit')
-                }}</span><span>{{
+                    }}</span><span>{{
                         t('domains._') }}</span>
             </template>
             <template #header-extra></template>
@@ -201,7 +201,5 @@ function validate(value: string, reg: RegExp, msg: string): Promise<void> {
 function easyInput(domain: string) {
     props.domain.admin_email = `admin@${domain}`
     props.domain.main_dns = `ns1.${domain}`
-
-    console.log(props.domain)
 }
 </script>
