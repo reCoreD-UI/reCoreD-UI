@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { NSpin, NFlex, NCard, NButton, NIcon, useNotification, NModalProvider } from 'naive-ui'
 import { PlusSquare } from "@vicons/fa"
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { type Domain, useDomainStore } from '@/stores/domains'
 import { getErrorInfo } from '@/apis/api'
 import DomainInfo from '@/components/domains/DomainInfo.vue'
@@ -12,10 +12,10 @@ import DomainEditModal from '@/components/domains/DomainEditModal.vue'
 const domainStore = useDomainStore()
 const notification = useNotification()
 
-const loading = defineModel<boolean>('loading', { default: true });
-const removeModalShow = defineModel<boolean>('removeModalShow', { default: false })
-const editModalShow = defineModel<boolean>('editModalShow', { default: false })
-const operationDomain = defineModel<Domain>('operationDomain', { default: {} as Domain })
+const loading = ref(true);
+const removeModalShow = ref(false);
+const editModalShow = ref(false);
+const operationDomain = ref({} as Domain)
 
 onMounted(() => {
     try {
@@ -38,7 +38,13 @@ function showEditModal(domain: Domain) {
 }
 
 function addDomain() {
-    const domain = {} as Domain
+    const domain = {
+        refresh_interval: 86400,
+        retry_interval: 7200,
+        expiry_period: 3600000,
+        negative_ttl: 86400,
+        serial_number: 1,
+    } as Domain
     showEditModal(domain)
 }
 </script>

@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import {
     NSpin, NPageHeader, useNotification,
-    NFlex, NButton, NIcon, NGrid, NGi, 
+    NFlex, NButton, NIcon, NGrid, NGi,
     NStatistic, NDataTable, NInput,
     NModalProvider
 } from 'naive-ui'
@@ -18,12 +18,8 @@ const { t } = useI18n()
 const props = defineProps<{
     domain: string
 }>()
-const loading = defineModel<boolean>('loading', { default: true });
-const records = defineModel<Record[]>('records');
-const soa = defineModel<SOARecord | undefined>('soa')
-const columns = defineModel<DataTableColumns<Record>>('columns')
 
-columns.value = [
+const columns = [
     {
         key: 'no',
         title: '#',
@@ -56,10 +52,14 @@ columns.value = [
             return <RecordOps record={row} />
         }
     }
-]
+] as DataTableColumns<Record>
 
 const recordStore = useRecordStore()
 const notification = useNotification()
+
+const records = ref<Record[] | undefined>([]);
+const soa = ref<SOARecord>({} as SOARecord)
+const loading = ref(true);
 onMounted(() => {
     try {
         refreshRecords()

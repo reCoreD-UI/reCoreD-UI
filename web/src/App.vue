@@ -13,14 +13,9 @@ import { RouterView } from "vue-router";
 import { onMounted } from "vue";
 
 const osThemeRef = useOsTheme()
-const theme = defineModel<GlobalTheme>('theme')
-theme.value = osThemeRef.value === 'dark' ? darkTheme : lightTheme
-
-const locale = defineModel<NLocale>('locale')
-locale.value = navigator.language === "zh-CN" ? zhCN : enUS
-
-const dateLocale = defineModel<NDateLocale>('dateLocale')
-dateLocale.value = navigator.language === "zh-CN" ? dateZhCN : dateEnUS
+const theme = osThemeRef.value === 'dark' ? darkTheme : lightTheme
+const locale = navigator.language === "zh-CN" ? zhCN : enUS
+const dateLocale = navigator.language === "zh-CN" ? dateZhCN : dateEnUS
 
 onMounted(() => {
   document.title = 'reCoreD-UI'

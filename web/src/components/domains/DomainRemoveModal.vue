@@ -1,6 +1,6 @@
 <template>
     <NModal :mask-closable="false" :show="show">
-        <NCard size="huge" role="dialog" aria-modal="true" style="width: 600px">
+        <NCard role="dialog" aria-modal="true" style="width: 600px">
             <template #header>
                 <NIcon class="icon-down" color="red">
                     <QuestionCircle />
@@ -48,11 +48,12 @@ import { Times, TrashAlt, QuestionCircle } from '@vicons/fa';
 
 import { useI18n } from 'vue-i18n';
 import { getErrorInfo } from '@/apis/api';
+import { ref } from 'vue';
 const { t } = useI18n()
 
 const show = defineModel<boolean>('show', { default: false })
-const domain_name = defineModel<string>('domain_name')
-const loading = defineModel<boolean>('loading', { default: false })
+const domain_name = ref<string>('')
+const loading = ref<boolean>(false)
 const domainStore = useDomainStore()
 const notification = useNotification()
 
