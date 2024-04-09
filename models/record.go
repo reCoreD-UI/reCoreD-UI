@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"strings"
 
 	dns "github.com/cloud66-oss/coredns_mysql"
 )
@@ -29,6 +30,13 @@ type Record struct {
 
 func (Record) TableName() string {
 	return "coredns_record"
+}
+
+func (r *Record) CheckZone() error {
+	if strings.HasSuffix(r.Zone, ".") {
+		return fmt.Errorf("zone should end with '.'")
+	}
+	return nil
 }
 
 type RecordContentTypes interface {

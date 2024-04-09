@@ -19,6 +19,10 @@ func (c *Controller) CreateRecord(r *models.Record) (*models.Record, error) {
 		}
 	}
 
+	if err := r.CheckZone(); err != nil {
+		return nil, err
+	}
+
 	if err := c.DB.Transaction(func(tx *gorm.DB) error {
 		return tx.Create(r).Error
 	}); err != nil {
@@ -31,6 +35,10 @@ func (c *Controller) CreateRecord(r *models.Record) (*models.Record, error) {
 func (c *Controller) CreateRecords(rs []*models.Record) error {
 	return c.DB.Transaction(func(tx *gorm.DB) error {
 		for _, r := range rs {
+			if err := r.CheckZone(); err != nil {
+				return err
+			}
+
 			if err := tx.Create(r).Error; err != nil {
 				return err
 			}
@@ -50,6 +58,10 @@ func (c *Controller) GetRecords(cond map[string]string) ([]models.Record, error)
 }
 
 func (c *Controller) UpdateRecord(r *models.Record) error {
+	if err := r.CheckZone(); err != nil {
+		return err
+	}
+
 	return c.DB.Transaction(func(tx *gorm.DB) error {
 		return tx.Model(r).Updates(r).Error
 	})

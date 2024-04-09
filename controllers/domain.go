@@ -22,7 +22,7 @@ func (c *Controller) CreateDomain(d *models.Domain) (*models.Domain, error) {
 		}
 
 		r := &models.RecordWithType[dns.SOARecord]{}
-		r.Zone = d.DomainName
+		r.Zone = fmt.Sprintf("%s.", d.DomainName)
 		r.Name = "@"
 		r.RecordType = models.RecordTypeSOA
 		r.Content.Ns = d.MainDNS
@@ -31,6 +31,9 @@ func (c *Controller) CreateDomain(d *models.Domain) (*models.Domain, error) {
 		r.Content.Retry = d.RetryInterval
 		r.Content.Expire = d.ExpiryPeriod
 		r.Content.MinTtl = d.NegativeTtl
+		if err := r.CheckZone(); err != nil {
+			return err
+		}
 
 		if err := tx.Create(r.ToRecord()).Error; err != nil {
 			return err
@@ -94,6 +97,10 @@ func (c *Controller) UpdateDomain(d *models.Domain) error {
 		r.Content.Retry = d.RetryInterval
 		r.Content.Expire = d.ExpiryPeriod
 		r.Content.MinTtl = d.NegativeTtl
+
+		if err := r.CheckZone(); err != nil {
+			return err
+		}
 
 		if err := tx.Where("record_type = ?", models.RecordTypeSOA).Where("zone = ?", d.DomainName).Save(r.ToRecord()).Error; err != nil {
 			return err
