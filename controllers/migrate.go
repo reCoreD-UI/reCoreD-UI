@@ -10,7 +10,8 @@ func Migrate() error {
 		return err
 	}
 
-	if err := (recordsDAO{}).Migrate(database.Client, models.Record{}); err != nil {
+	var recordDefiniation models.IRecord = &models.Record[models.RecordContentDefault]{}
+	if err := (recordsDAO{}).Migrate(database.Client, recordDefiniation); err != nil {
 		return err
 	}
 

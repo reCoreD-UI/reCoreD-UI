@@ -25,34 +25,30 @@ func CreateDomain(d *models.Domain) (*models.Domain, error) {
 		return nil, err
 	}
 
-	r := &models.RecordWithType[dns.SOARecord]{}
+	r := &models.Record[dns.SOARecord]{}
 	r.Zone = d.WithDotEnd()
 	r.Name = "@"
 	r.RecordType = models.RecordTypeSOA
-	r.Content.Ns = d.MainDNS
-	r.Content.MBox = d.EmailSOAForamt()
-	r.Content.Refresh = d.RefreshInterval
-	r.Content.Retry = d.RetryInterval
-	r.Content.Expire = d.ExpiryPeriod
-	r.Content.MinTtl = d.NegativeTtl
+	r.Content = d.GenerateSOA()
 	if err := r.CheckZone(); err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
-	if _, err := (recordsDAO{}).Create(tx, *r.ToRecord()); err != nil {
+	if _, err := (recordsDAO{}).Create(tx, r); err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
 	for i, ns := range nss {
-		record := &models.RecordWithType[dns.NSRecord]{}
-		record.Zone = d.WithDotEnd()
-		record.RecordType = models.RecordTypeNS
+		record := &models.Record[dns.NSRecord]{
+			Zone:       d.WithDotEnd(),
+			RecordType: models.RecordTypeSOA,
+			Name:       fmt.Sprintf("ns%d", i+1),
+		}
 		record.Content.Host = ns
-		record.Name = fmt.Sprintf("ns%d", i+1)
 
-		if _, err := (recordsDAO{}).Create(tx, *record.ToRecord()); err != nil {
+		if _, err := (recordsDAO{}).Create(tx, record); err != nil {
 			tx.Rollback()
 			return nil, err
 		}
@@ -77,7 +73,7 @@ func UpdateDomain(d *models.Domain) error {
 		return err
 	}
 
-	soa, err := (recordsDAO{}).GetOne(tx, models.Record{
+	soa, err := (recordsDAO{}).GetOne(tx, &models.Record[models.RecordContentDefault]{
 		RecordType: models.RecordTypeSOA, Zone: d.WithDotEnd(),
 	})
 	if err != nil {
@@ -85,24 +81,19 @@ func UpdateDomain(d *models.Domain) error {
 		return err
 	}
 
-	r := &models.RecordWithType[dns.SOARecord]{}
-	if err := r.FromRecord(&soa); err != nil {
+	r := &models.Record[dns.SOARecord]{}
+	if err := r.FromEntity(soa); err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	r.Content.Ns = d.MainDNS
-	r.Content.MBox = d.EmailSOAForamt()
-	r.Content.Refresh = d.RefreshInterval
-	r.Content.Retry = d.RetryInterval
-	r.Content.Expire = d.ExpiryPeriod
-	r.Content.MinTtl = d.NegativeTtl
+	r.Content = d.GenerateSOA()
 	if err := r.CheckZone(); err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	if _, err := (recordsDAO{}).Update(tx, *r.ToRecord()); err != nil {
+	if _, err := (recordsDAO{}).Update(tx, r); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -130,7 +121,7 @@ func DeleteDomain(id string) error {
 		return err
 	}
 
-	if err := (recordsDAO{}).Delete(tx, models.Record{Zone: domain.WithDotEnd()}); err != nil {
+	if err := (recordsDAO{}).Delete(tx, &models.Record[models.RecordContentDefault]{Zone: domain.WithDotEnd()}); err != nil {
 		tx.Rollback()
 		return err
 	}

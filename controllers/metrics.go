@@ -41,7 +41,7 @@ func RegisterMetrics() {
 	}
 }
 
-func  RefreshMetrics() error {
+func RefreshMetrics() error {
 	domainCounts, err := getDomainCounts()
 	if err != nil {
 		return err

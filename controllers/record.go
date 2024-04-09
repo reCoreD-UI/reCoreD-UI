@@ -10,11 +10,11 @@ import (
 )
 
 type recordsDAO struct {
-	database.BaseDAO[models.Record]
+	database.BaseDAO[models.IRecord]
 }
 
-func CreateRecord(r *models.Record) (*models.Record, error) {
-	if r.RecordType != models.RecordTypeSOA {
+func CreateRecord(r models.IRecord) (models.IRecord, error) {
+	if r.GetType() != models.RecordTypeSOA {
 		_, err := GetDomains(r.WithOutDotTail())
 		if err != nil {
 			return nil, err
@@ -25,11 +25,11 @@ func CreateRecord(r *models.Record) (*models.Record, error) {
 		return nil, err
 	}
 
-	res, err := (recordsDAO{}).Create(database.Client, *r)
-	return &res, err
+	res, err := (recordsDAO{}).Create(database.Client, r)
+	return res, err
 }
 
-func CreateRecords(rs []*models.Record) error {
+func CreateRecords(rs []models.IRecord) error {
 	tx := database.Client.Begin()
 	for _, r := range rs {
 		if err := r.CheckZone(); err != nil {
@@ -37,7 +37,7 @@ func CreateRecords(rs []*models.Record) error {
 			return err
 		}
 
-		if _, err := (recordsDAO{}).Create(tx, *r); err != nil {
+		if _, err := (recordsDAO{}).Create(tx, r); err != nil {
 			tx.Rollback()
 			return err
 		}
@@ -46,16 +46,16 @@ func CreateRecords(rs []*models.Record) error {
 	return nil
 }
 
-func GetRecords(cond models.Record) ([]models.Record, error) {
+func GetRecords(cond models.IRecord) ([]models.IRecord, error) {
 	return (recordsDAO{}).GetAll(database.Client, cond)
 }
 
-func UpdateRecord(r *models.Record) error {
+func UpdateRecord(r models.IRecord) error {
 	if err := r.CheckZone(); err != nil {
 		return err
 	}
 
-	if _, err := (recordsDAO{}).Update(database.Client, *r); err != nil {
+	if _, err := (recordsDAO{}).Update(database.Client, r); err != nil {
 		return err
 	}
 	return nil
@@ -68,13 +68,13 @@ func DeleteRecord(domain, id string) error {
 	}
 
 	tx := database.Client.Begin()
-	record, err := (recordsDAO{}).GetOne(tx, models.Record{ID: ID, Zone: fmt.Sprintf("%s.", domain)})
+	record, err := (recordsDAO{}).GetOne(tx, &models.Record[models.RecordContentDefault]{ID: ID, Zone: fmt.Sprintf("%s.", domain)})
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	if record.RecordType == models.RecordTypeSOA {
+	if record.GetType() == models.RecordTypeSOA {
 		tx.Rollback()
 		return gorm.ErrRecordNotFound
 	}
@@ -90,14 +90,18 @@ func DeleteRecord(domain, id string) error {
 
 // for metrics
 func getRecordCounts() (map[string]float64, error) {
-	rows, err := (recordsDAO{}).GetAll(database.Client, models.Record{})
+	rows, err := (recordsDAO{}).GetAll(database.Client, &models.Record[models.RecordContentDefault]{})
 	if err != nil {
 		return nil, err
 	}
 
 	result := make(map[string]float64)
 	for _, row := range rows {
-		result[row.Zone] += 1
+		record := &models.Record[models.RecordContentDefault]{}
+		if err := record.FromEntity(row); err != nil {
+			return nil, err
+		}
+		result[record.Zone] += 1
 	}
 	return result, nil
 }

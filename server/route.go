@@ -37,18 +37,18 @@ func (s *Server) setupRoute() {
 
 	domains := groupV1.Group("/domains")
 	domains.
-		GET("/", s.getDomains).
-		POST("/", s.createDomain).
-		PUT("/", s.updateDomain).
-		DELETE("/:id", s.deleteDomain)
+		GET("/", getDomains).
+		POST("/", createDomain).
+		PUT("/", updateDomain).
+		DELETE("/:id", deleteDomain)
 
 	records := groupV1.Group("/records")
 	records.
-		GET("/:domain", s.getRecords).
-		POST("/:domain", s.createRecord).
-		POST("/:domain/bulk", s.createRecords).
-		PUT("/:domain", s.updateRecord).
-		DELETE("/:domain/:id", s.deleteRecord)
+		GET("/:domain", getRecords).
+		POST("/:domain", createRecord).
+		POST("/:domain/bulk", createRecords).
+		PUT("/:domain", updateRecord).
+		DELETE("/:domain/:id", deleteRecord)
 
 	server := s.webServer.Group(s.prefix)
 	server.Use(func(ctx *gin.Context) {

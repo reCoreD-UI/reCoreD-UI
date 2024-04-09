@@ -3,6 +3,8 @@ package models
 import (
 	"fmt"
 	"strings"
+
+	dns "github.com/cloud66-oss/coredns_mysql"
 )
 
 type Domain struct {
@@ -30,5 +32,16 @@ func (d *Domain) WithDotEnd() string {
 		return d.DomainName
 	} else {
 		return fmt.Sprintf("%s.", d.DomainName)
+	}
+}
+
+func (d *Domain) GenerateSOA() dns.SOARecord {
+	return dns.SOARecord{
+		Ns:      d.MainDNS,
+		MBox:    d.EmailSOAForamt(),
+		Refresh: d.RefreshInterval,
+		Retry:   d.RetryInterval,
+		Expire:  d.ExpiryPeriod,
+		MinTtl:  d.NegativeTtl,
 	}
 }

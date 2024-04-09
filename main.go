@@ -26,7 +26,7 @@ func main() {
 			Name:     "mysql-dsn",
 			Usage:    "mysql dsn",
 			Required: true,
-			EnvVars: []string{"RECORED_MYSQL_DSN"},
+			EnvVars:  []string{"RECORED_MYSQL_DSN"},
 		},
 		&cli.BoolFlag{
 			Name:  "debug",

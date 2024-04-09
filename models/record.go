@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -19,50 +20,58 @@ const (
 	RecordTypeSRV   = "SRV"
 )
 
-type Record struct {
+type RecordContentDefault any
+
+type recordContentTypes interface {
+	dns.ARecord | dns.AAAARecord | dns.CNAMERecord | dns.CAARecord | dns.NSRecord | dns.MXRecord | dns.SOARecord | dns.SRVRecord | dns.TXTRecord | RecordContentDefault
+}
+
+type Record[T recordContentTypes] struct {
 	ID         int    `gorm:"primaryKey" json:"id"`
 	Zone       string `gorm:"not null,size:255" json:"zone"`
 	Name       string `gorm:"not null,size:255" json:"name"`
 	Ttl        int    `json:"ttl"`
-	Content    any    `gorm:"serializer:json,type:\"text\"" json:"content"`
+	Content    T      `gorm:"serializer:json,type:\"text\"" json:"content"`
 	RecordType string `gorm:"not null,size:255" json:"record_type"`
 }
 
-func (Record) TableName() string {
+func (Record[T]) TableName() string {
 	return "coredns_record"
 }
 
-func (r Record) CheckZone() error {
+func (r Record[T]) CheckZone() error {
 	if strings.HasSuffix(r.Zone, ".") {
 		return fmt.Errorf("zone should end with '.'")
 	}
 	return nil
 }
 
-func (r Record) WithOutDotTail() string {
+func (r Record[T]) WithOutDotTail() string {
 	return strings.TrimRight(r.Zone, ".")
 }
 
-type RecordContentTypes interface {
-	dns.ARecord | dns.AAAARecord | dns.CNAMERecord | dns.CAARecord | dns.NSRecord | dns.MXRecord | dns.SOARecord | dns.SRVRecord | dns.TXTRecord
+func (r Record[T]) ToEntity() IRecord {
+	return &r
 }
 
-type RecordWithType[T RecordContentTypes] struct {
-	Record
-	Content T `json:"content"`
-}
-
-func (r *RecordWithType[T]) ToRecord() *Record {
-	r.Record.Content = r.Content
-	return &r.Record
-}
-
-func (r *RecordWithType[T]) FromRecord(record *Record) error {
-	r.Record = *record
-
-	var ok bool
-	if r.Content, ok = record.Content.(T); !ok {
-		return fmt.Errorf("cannot convert record type")
+func (r *Record[T]) FromEntity(entity any) error {
+	b, err := json.Marshal(entity)
+	if err != nil {
+		return err
 	}
-	return nil
+
+	return json.Unmarshal(b, r)
+}
+
+func (r Record[T]) GetType() string {
+	return r.RecordType
+}
+
+type IRecord interface {
+	TableName() string
+	CheckZone() error
+	WithOutDotTail() string
+	ToEntity() IRecord
+	FromEntity(any) error
+	GetType() string
 }

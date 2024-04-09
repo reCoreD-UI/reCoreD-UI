@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) getDomains(c *gin.Context) {
+func getDomains(c *gin.Context) {
 	domains, err := controllers.GetDomains("")
 	if err != nil {
 		errorHandler(c, err)
@@ -21,7 +21,7 @@ func (s *Server) getDomains(c *gin.Context) {
 	})
 }
 
-func (s *Server) createDomain(c *gin.Context) {
+func createDomain(c *gin.Context) {
 	domain := &models.Domain{}
 
 	if err := c.BindJSON(domain); err != nil {
@@ -44,7 +44,7 @@ func (s *Server) createDomain(c *gin.Context) {
 	})
 }
 
-func (s *Server) updateDomain(c *gin.Context) {
+func updateDomain(c *gin.Context) {
 	domain := &models.Domain{}
 
 	if err := c.BindJSON(domain); err != nil {
@@ -65,7 +65,7 @@ func (s *Server) updateDomain(c *gin.Context) {
 	})
 }
 
-func (s *Server) deleteDomain(c *gin.Context) {
+func deleteDomain(c *gin.Context) {
 	id := c.Param("id")
 	if err := controllers.DeleteDomain(id); err != nil {
 		errorHandler(c, err)
