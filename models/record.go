@@ -2,11 +2,13 @@ package models
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"strings"
 
 	dns "github.com/cloud66-oss/coredns_mysql"
 )
+
+var ErrorZoneNotEndWithDot = errors.New("zone should end with '.'")
 
 const (
 	RecordTypeA     = "A"
@@ -41,7 +43,7 @@ func (Record[T]) TableName() string {
 
 func (r Record[T]) CheckZone() error {
 	if strings.HasSuffix(r.Zone, ".") {
-		return fmt.Errorf("zone should end with '.'")
+		return ErrorZoneNotEndWithDot
 	}
 	return nil
 }

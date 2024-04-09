@@ -3,6 +3,7 @@ package server
 import (
 	"errors"
 	"net/http"
+	"reCoreD-UI/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -17,16 +18,21 @@ type Response struct {
 
 func errorHandler(c *gin.Context, err error) {
 	logrus.Error(err)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
 		c.JSON(http.StatusNotFound, Response{
 			Succeed: false,
 			Message: err.Error(),
 		})
-	} else {
+	case errors.Is(err, models.ErrorZoneNotEndWithDot):
+		c.JSON(http.StatusBadRequest, Response{
+			Succeed: false,
+			Message: err.Error(),
+		})
+	default:
 		c.JSON(http.StatusInternalServerError, Response{
 			Succeed: false,
 			Message: err.Error(),
-			Data:    nil,
 		})
 	}
 }
