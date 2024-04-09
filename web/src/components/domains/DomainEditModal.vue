@@ -191,6 +191,7 @@ async function confirm() {
     } catch (e) {
         const msg = getErrorInfo(e)
         notification.error(msg)
+        console.error(e)
     }
     loading.value = false
 }

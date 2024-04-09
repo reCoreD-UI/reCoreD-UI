@@ -66,6 +66,7 @@ onMounted(() => {
     } catch (err) {
         const msg = getErrorInfo(err)
         notification.error(msg)
+        console.error(err)
     }
 })
 

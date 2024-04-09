@@ -24,6 +24,7 @@ onMounted(() => {
     } catch (error) {
         const msg = getErrorInfo(error)
         notification.error(msg)
+        console.error(error)
     }
 })
 
