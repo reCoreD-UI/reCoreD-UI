@@ -207,7 +207,6 @@ function validate(value: string, reg: RegExp, msg: string, flag: validFlags): Pr
             invalidData.value |= flag
             resolve()
         }
-        console.log(invalidData.value === allFlags)
     })
 }
 
