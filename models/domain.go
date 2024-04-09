@@ -1,6 +1,9 @@
 package models
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type Domain struct {
 	ID         int    `gorm:"primaryKey" json:"id"`
@@ -20,4 +23,12 @@ func (d *Domain) EmailSOAForamt() string {
 	s := strings.Split(d.AdminEmail, "@")
 	s[0] = strings.Replace(s[0], ".", "\\", -1)
 	return strings.Join(s, ".")
+}
+
+func (d *Domain) WithDotEnd() string {
+	if strings.HasSuffix(d.DomainName, ".") {
+		return d.DomainName
+	} else {
+		return fmt.Sprintf("%s.", d.DomainName)
+	}
 }

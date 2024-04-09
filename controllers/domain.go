@@ -22,7 +22,7 @@ func (c *Controller) CreateDomain(d *models.Domain) (*models.Domain, error) {
 		}
 
 		r := &models.RecordWithType[dns.SOARecord]{}
-		r.Zone = fmt.Sprintf("%s.", d.DomainName)
+		r.Zone = d.WithDotEnd()
 		r.Name = "@"
 		r.RecordType = models.RecordTypeSOA
 		r.Content.Ns = d.MainDNS
