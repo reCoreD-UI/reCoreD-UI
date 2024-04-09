@@ -1,11 +1,22 @@
 package controllers
 
-import "reCoreD-UI/models"
+import (
+	"reCoreD-UI/database"
+	"reCoreD-UI/models"
+)
 
-func (c *Controller) Migrate() error {
-	return c.DB.Set("gorm:table_options", "CHARSET=utf8mb4").AutoMigrate(
-		&models.Domain{},
-		&models.Record{},
-		&models.Settings{},
-	)
+func Migrate() error {
+	if err := (domainsDAO{}).Migrate(database.Client, models.Domain{}); err != nil {
+		return err
+	}
+
+	if err := (recordsDAO{}).Migrate(database.Client, models.Record{}); err != nil {
+		return err
+	}
+
+	if err := (settingsDAO{}).Migrate(database.Client, models.Settings{}); err != nil {
+		return err
+	}
+
+	return nil
 }

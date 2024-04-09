@@ -32,11 +32,15 @@ func (Record) TableName() string {
 	return "coredns_record"
 }
 
-func (r *Record) CheckZone() error {
+func (r Record) CheckZone() error {
 	if strings.HasSuffix(r.Zone, ".") {
 		return fmt.Errorf("zone should end with '.'")
 	}
 	return nil
+}
+
+func (r Record) WithOutDotTail() string {
+	return strings.TrimRight(r.Zone, ".")
 }
 
 type RecordContentTypes interface {

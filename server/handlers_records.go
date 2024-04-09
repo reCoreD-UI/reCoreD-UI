@@ -1,14 +1,16 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
+	"reCoreD-UI/controllers"
 	"reCoreD-UI/models"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (s *Server) getRecords(c *gin.Context) {
-	query := make(map[string]string)
+	query := models.Record{}
 	if err := c.BindQuery(&query); err != nil {
 		c.JSON(http.StatusBadRequest, Response{
 			Succeed: false,
@@ -17,9 +19,9 @@ func (s *Server) getRecords(c *gin.Context) {
 		return
 	}
 	domain := c.Param("domain")
-	query["zone"] = domain
+	query.Zone = fmt.Sprintf("%s.", domain)
 
-	records, err := s.controller.GetRecords(query)
+	records, err := controllers.GetRecords(query)
 	if err != nil {
 		errorHandler(c, err)
 		return
@@ -50,15 +52,15 @@ func (s *Server) createRecord(c *gin.Context) {
 		return
 	}
 
-	record, err := s.controller.CreateRecord(record)
-	if  err != nil {
+	record, err := controllers.CreateRecord(record)
+	if err != nil {
 		errorHandler(c, err)
 		return
 	}
 
 	c.JSON(http.StatusCreated, Response{
 		Succeed: true,
-		Data: record,
+		Data:    record,
 	})
 }
 
@@ -72,7 +74,7 @@ func (s *Server) createRecords(c *gin.Context) {
 		return
 	}
 
-	if err := s.controller.CreateRecords(records); err != nil {
+	if err := controllers.CreateRecords(records); err != nil {
 		errorHandler(c, err)
 		return
 	}
@@ -101,7 +103,7 @@ func (s *Server) updateRecord(c *gin.Context) {
 		return
 	}
 
-	if err := s.controller.UpdateRecord(record); err != nil {
+	if err := controllers.UpdateRecord(record); err != nil {
 		errorHandler(c, err)
 		return
 	}
@@ -115,7 +117,7 @@ func (s *Server) deleteRecord(c *gin.Context) {
 	domain := c.Param("domain")
 	id := c.Param("id")
 
-	if err := s.controller.DeleteRecord(domain, id); err != nil {
+	if err := controllers.DeleteRecord(domain, id); err != nil {
 		errorHandler(c, err)
 		return
 	}

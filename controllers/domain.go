@@ -2,144 +2,148 @@ package controllers
 
 import (
 	"fmt"
+	"reCoreD-UI/database"
 	"reCoreD-UI/models"
 	"strconv"
 
 	dns "github.com/cloud66-oss/coredns_mysql"
-
-	"gorm.io/gorm"
 )
 
-func (c *Controller) CreateDomain(d *models.Domain) (*models.Domain, error) {
-	nss, err := c.GetDNS()
+type domainsDAO struct {
+	database.BaseDAO[models.Domain]
+}
+
+func CreateDomain(d *models.Domain) (*models.Domain, error) {
+	nss, err := GetDNS()
 	if err != nil {
 		return nil, err
 	}
 
-	if err := c.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Create(d).Error; err != nil {
-			return err
-		}
-
-		r := &models.RecordWithType[dns.SOARecord]{}
-		r.Zone = d.WithDotEnd()
-		r.Name = "@"
-		r.RecordType = models.RecordTypeSOA
-		r.Content.Ns = d.MainDNS
-		r.Content.MBox = d.EmailSOAForamt()
-		r.Content.Refresh = d.RefreshInterval
-		r.Content.Retry = d.RetryInterval
-		r.Content.Expire = d.ExpiryPeriod
-		r.Content.MinTtl = d.NegativeTtl
-		if err := r.CheckZone(); err != nil {
-			return err
-		}
-
-		if err := tx.Create(r.ToRecord()).Error; err != nil {
-			return err
-		}
-
-		for i, ns := range nss {
-			record := &models.RecordWithType[dns.NSRecord]{}
-			record.Zone = d.DomainName
-			record.RecordType = models.RecordTypeNS
-			record.Content.Host = ns
-			record.Name = fmt.Sprintf("ns%d", i+1)
-
-			if err := tx.Create(record.ToRecord()).Error; err != nil {
-				return err
-			}
-		}
-
-		return nil
-	}); err != nil {
+	tx := database.Client.Begin()
+	if _, err := (domainsDAO{}).Create(tx, *d); err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
+	r := &models.RecordWithType[dns.SOARecord]{}
+	r.Zone = d.WithDotEnd()
+	r.Name = "@"
+	r.RecordType = models.RecordTypeSOA
+	r.Content.Ns = d.MainDNS
+	r.Content.MBox = d.EmailSOAForamt()
+	r.Content.Refresh = d.RefreshInterval
+	r.Content.Retry = d.RetryInterval
+	r.Content.Expire = d.ExpiryPeriod
+	r.Content.MinTtl = d.NegativeTtl
+	if err := r.CheckZone(); err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	if _, err := (recordsDAO{}).Create(tx, *r.ToRecord()); err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	for i, ns := range nss {
+		record := &models.RecordWithType[dns.NSRecord]{}
+		record.Zone = d.WithDotEnd()
+		record.RecordType = models.RecordTypeNS
+		record.Content.Host = ns
+		record.Name = fmt.Sprintf("ns%d", i+1)
+
+		if _, err := (recordsDAO{}).Create(tx, *record.ToRecord()); err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
+
+	tx.Commit()
 	return d, err
 }
 
-func (c *Controller) GetDomains(domain string) ([]models.Domain, error) {
-	var domains []models.Domain
-
-	tx := c.DB
-
+func GetDomains(domain string) ([]models.Domain, error) {
 	if domain != "" {
-		tx = tx.Where(&models.Domain{DomainName: domain})
+		return (domainsDAO{}).GetAll(database.Client, models.Domain{DomainName: domain})
+	} else {
+		return (domainsDAO{}).GetAll(database.Client, models.Domain{})
 	}
-
-	if err := tx.Find(&domains).Error; err != nil {
-		return nil, err
-	}
-
-	return domains, nil
 }
 
-func (c *Controller) UpdateDomain(d *models.Domain) error {
-	return c.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Model(d).Updates(d).Error; err != nil {
-			return err
-		}
+func UpdateDomain(d *models.Domain) error {
+	tx := database.Client.Begin()
+	if _, err := (domainsDAO{}).Update(tx, *d); err != nil {
+		tx.Rollback()
+		return err
+	}
 
-		record := &models.Record{}
-		if err := tx.Where("record_type = ?", models.RecordTypeSOA).Where("zone = ?", d.DomainName).First(record).Error; err != nil {
-			return err
-		}
-
-		r := &models.RecordWithType[dns.SOARecord]{}
-		if err := r.FromRecord(record); err != nil {
-			return err
-		}
-
-		r.Content.Ns = d.MainDNS
-		r.Content.MBox = d.EmailSOAForamt()
-		r.Content.Refresh = d.RefreshInterval
-		r.Content.Retry = d.RetryInterval
-		r.Content.Expire = d.ExpiryPeriod
-		r.Content.MinTtl = d.NegativeTtl
-
-		if err := r.CheckZone(); err != nil {
-			return err
-		}
-
-		if err := tx.Where("record_type = ?", models.RecordTypeSOA).Where("zone = ?", d.DomainName).Save(r.ToRecord()).Error; err != nil {
-			return err
-		}
-
-		return nil
+	soa, err := (recordsDAO{}).GetOne(tx, models.Record{
+		RecordType: models.RecordTypeSOA, Zone: d.WithDotEnd(),
 	})
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	r := &models.RecordWithType[dns.SOARecord]{}
+	if err := r.FromRecord(&soa); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	r.Content.Ns = d.MainDNS
+	r.Content.MBox = d.EmailSOAForamt()
+	r.Content.Refresh = d.RefreshInterval
+	r.Content.Retry = d.RetryInterval
+	r.Content.Expire = d.ExpiryPeriod
+	r.Content.MinTtl = d.NegativeTtl
+	if err := r.CheckZone(); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if _, err := (recordsDAO{}).Update(tx, *r.ToRecord()); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+	return nil
+
 }
 
-func (c *Controller) DeleteDomain(id string) error {
+func DeleteDomain(id string) error {
 	ID, err := strconv.Atoi(id)
 	if err != nil {
 		return err
 	}
 
-	return c.DB.Transaction(func(tx *gorm.DB) error {
-		domain := &models.Domain{
-			ID: ID,
-		}
-		if err := tx.First(&domain).Error; err != nil {
-			return err
-		}
+	tx := database.Client.Begin()
+	domain, err := (domainsDAO{}).GetOne(tx, models.Domain{ID: ID})
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
 
-		if err := tx.Where("zone = ?", domain.DomainName).Delete(&models.Record{}).Error; err != nil {
-			return err
-		}
+	if err := (domainsDAO{}).Delete(tx, models.Domain{ID: ID}); err != nil {
+		tx.Rollback()
+		return err
+	}
 
-		if err := tx.Delete(&domain).Error; err != nil {
-			return err
-		}
+	if err := (recordsDAO{}).Delete(tx, models.Record{Zone: domain.WithDotEnd()}); err != nil {
+		tx.Rollback()
+		return err
+	}
 
-		return nil
-	})
+	tx.Commit()
+	return nil
 }
 
-func (c *Controller) getDomainCounts() (float64, error) {
-	var count int64
-	if err := c.DB.Model(models.Domain{}).Count(&count).Error; err != nil {
+// for metrics
+func getDomainCounts() (float64, error) {
+	c, err := (domainsDAO{}).GetAll(database.Client, models.Domain{})
+	if err != nil {
 		return 0, err
 	}
-	return float64(count), nil
+	return float64(len(c)), nil
 }

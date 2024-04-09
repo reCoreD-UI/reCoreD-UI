@@ -2,6 +2,7 @@ package server
 
 import (
 	"path"
+	"reCoreD-UI/controllers"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -15,14 +16,14 @@ const (
 )
 
 func (s *Server) setupRoute() {
-	username, password, err := s.controller.GetAdmin()
+	username, password, err := controllers.GetAdmin()
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
 	metricHandler := gin.New()
 	metricHandler.GET(metricPrefix, func(ctx *gin.Context) {
-		if err := s.controller.RefreshMetrics(); err != nil {
+		if err := controllers.RefreshMetrics(); err != nil {
 			logrus.Error(err)
 		}
 		promhttp.Handler().ServeHTTP(ctx.Writer, ctx.Request)

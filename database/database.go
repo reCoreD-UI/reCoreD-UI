@@ -5,6 +5,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func Connect(DSN string) (*gorm.DB, error) {
-	return gorm.Open(mysql.Open(DSN), &gorm.Config{})
+var Client *gorm.DB
+
+func Connect(DSN string) error {
+	var err error
+	Client, err = gorm.Open(mysql.Open(DSN), &gorm.Config{})
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -2,13 +2,14 @@ package server
 
 import (
 	"net/http"
+	"reCoreD-UI/controllers"
 	"reCoreD-UI/models"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (s *Server) getDomains(c *gin.Context) {
-	domains, err := s.controller.GetDomains("")
+	domains, err := controllers.GetDomains("")
 	if err != nil {
 		errorHandler(c, err)
 		return
@@ -31,7 +32,7 @@ func (s *Server) createDomain(c *gin.Context) {
 		return
 	}
 
-	domain, err := s.controller.CreateDomain(domain)
+	domain, err := controllers.CreateDomain(domain)
 	if err != nil {
 		errorHandler(c, err)
 		return
@@ -54,7 +55,7 @@ func (s *Server) updateDomain(c *gin.Context) {
 		return
 	}
 
-	if err := s.controller.UpdateDomain(domain); err != nil {
+	if err := controllers.UpdateDomain(domain); err != nil {
 		errorHandler(c, err)
 		return
 	}
@@ -66,7 +67,7 @@ func (s *Server) updateDomain(c *gin.Context) {
 
 func (s *Server) deleteDomain(c *gin.Context) {
 	id := c.Param("id")
-	if err := s.controller.DeleteDomain(id); err != nil {
+	if err := controllers.DeleteDomain(id); err != nil {
 		errorHandler(c, err)
 		return
 	}

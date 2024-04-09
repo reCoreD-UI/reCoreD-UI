@@ -22,8 +22,7 @@ var (
 	}, []string{"domain"})
 )
 
-func (c *Controller) RegisterMetrics() {
-
+func RegisterMetrics() {
 	prometheus.MustRegister(GaugeDomainCounts, GaugeRecordCounts)
 
 	GormMetrics := ormMetric.New(ormMetric.Config{
@@ -42,14 +41,14 @@ func (c *Controller) RegisterMetrics() {
 	}
 }
 
-func (c *Controller) RefreshMetrics() error {
-	domainCounts, err := c.getDomainCounts()
+func  RefreshMetrics() error {
+	domainCounts, err := getDomainCounts()
 	if err != nil {
 		return err
 	}
 	GaugeDomainCounts.Set(domainCounts)
 
-	recordCounts, err := c.getRecordCounts()
+	recordCounts, err := getRecordCounts()
 	if err != nil {
 		return err
 	}

@@ -1,10 +1,12 @@
 package server
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 type Response struct {
@@ -15,9 +17,16 @@ type Response struct {
 
 func errorHandler(c *gin.Context, err error) {
 	logrus.Error(err)
-	c.JSON(http.StatusInternalServerError, Response{
-		Succeed: false,
-		Message: err.Error(),
-		Data:    nil,
-	})
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.JSON(http.StatusNotFound, Response{
+			Succeed: false,
+			Message: err.Error(),
+		})
+	} else {
+		c.JSON(http.StatusInternalServerError, Response{
+			Succeed: false,
+			Message: err.Error(),
+			Data:    nil,
+		})
+	}
 }

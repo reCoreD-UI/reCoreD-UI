@@ -2,6 +2,7 @@ package config
 
 import (
 	"reCoreD-UI/controllers"
+	"reCoreD-UI/database"
 
 	"github.com/urfave/cli/v2"
 )
@@ -33,10 +34,8 @@ func init() {
 }
 
 func setUser(c *cli.Context) error {
-	controller, err := controllers.NewController(c.String("mysql-dsn"))
-	if err != nil {
+	if err := database.Connect(c.String("mysql-dsn")); err != nil {
 		return err
 	}
-	defer controller.Close()
-	return controller.SetupAdmin(c.String("username"), c.String("password"))
+	return controllers.SetupAdmin(c.String("username"), c.String("password"))
 }
