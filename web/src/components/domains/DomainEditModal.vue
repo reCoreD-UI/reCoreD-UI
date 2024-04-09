@@ -124,7 +124,7 @@ const rules = {
         validator: (_rule: FormItemRule, value: string) => {
             return validate(
                 value,
-                /([\w-]+\.)+[\w-]+/,
+                /^([\w-]+\.)+[\w-]+$/,
                 'domains.errors.domainName',
                 validFlags.domainNameValid
             )
@@ -137,7 +137,7 @@ const rules = {
         validator: (_rule: FormItemRule, value: string) => {
             return validate(
                 value,
-                /([\w-]+\.)+[\w-]+/,
+                /^([\w-]+\.)+[\w-]+$/,
                 'domains.errors.domainName',
                 validFlags.mainNsValid,
             )
@@ -149,7 +149,7 @@ const rules = {
         validator: (_rule: FormItemRule, value: string) => {
             return validate(
                 value,
-                /[\w-.]+@([\w-]+\.)+[\w-]+/,
+                /^[\w-.]+@([\w-]+\.)+[\w-]+$/,
                 'domains.errors.mail',
                 validFlags.adminEmailValid
             )
