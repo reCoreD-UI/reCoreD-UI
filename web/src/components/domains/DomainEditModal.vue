@@ -63,7 +63,7 @@
                         {{ t('common.cancel') }}
                     </NButton>
                     <NSpin :show="loading">
-                        <NButton size="small" type="primary" :disabled="loading || invalidData" @click="confirm">
+                        <NButton size="small" type="primary" :disabled="loading || invalidData !== allFlags" @click="confirm" attr-type="submit">
                             <template #icon>
                                 <NIcon>
                                     <Check />
@@ -99,6 +99,14 @@ import {
 } from 'naive-ui'
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+
+const enum validFlags {
+    domainNameValid = 1,
+    mainNsValid = domainNameValid << 1,
+    adminEmailValid = mainNsValid << 1
+}
+const allFlags = validFlags.adminEmailValid|validFlags.mainNsValid|validFlags.domainNameValid
+
 const { t } = useI18n()
 
 const props = defineProps<{
@@ -108,7 +116,7 @@ const props = defineProps<{
 const show = defineModel<boolean>('show', { default: false })
 
 const loading = ref(false)
-const invalidData = ref(false)
+const invalidData = ref(0)
 const rules = {
     domain_name: [{
         required: true,
@@ -117,7 +125,8 @@ const rules = {
             return validate(
                 value,
                 /([\w-]+\.)+[\w-]+/,
-                'domains.errors.domainName'
+                'domains.errors.domainName',
+                validFlags.domainNameValid
             )
         }
     }],
@@ -129,7 +138,8 @@ const rules = {
             return validate(
                 value,
                 /([\w-]+\.)+[\w-]+/,
-                'domains.errors.domainName'
+                'domains.errors.domainName',
+                validFlags.mainNsValid,
             )
         }
     }],
@@ -140,7 +150,8 @@ const rules = {
             return validate(
                 value,
                 /[\w-.]+@([\w-]+\.)+[\w-]+/,
-                'domains.errors.mail'
+                'domains.errors.mail',
+                validFlags.adminEmailValid
             )
         }
     }],
@@ -184,17 +195,19 @@ async function confirm() {
     loading.value = false
 }
 
-function validate(value: string, reg: RegExp, msg: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-        invalidData.value = true
+function validate(value: string, reg: RegExp, msg: string, flag: validFlags): Promise<void> {
+    return new Promise<void>((resolve, reject) => { 
         if (!value) {
+            invalidData.value &= ~flag
             reject(Error(t('common.mandatory')))
         } else if (!reg.test(value)) {
+            invalidData.value &= ~flag
             reject(Error(t(msg)))
         } else {
-            invalidData.value = false
+            invalidData.value |= flag
             resolve()
         }
+        console.log(invalidData.value === allFlags)
     })
 }
 
