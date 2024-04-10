@@ -24,17 +24,16 @@
                         </template>
                         {{ t('common.cancel') }}
                     </NButton>
-                    <NSpin :show="loading">
-                        <NButton size="small" type="error" :disabled="(domain_name !== domain?.domain_name) || loading"
-                            @click="confirm">
-                            <template #icon>
-                                <NIcon>
-                                    <TrashAlt />
-                                </NIcon>
-                            </template>
-                            {{ t('common.confirm') }}
-                        </NButton>
-                    </NSpin>
+
+                    <NButton size="small" type="error" :disabled="domain_name !== domain?.domain_name"
+                        :loading="loading" @click="confirm">
+                        <template #icon>
+                            <NIcon>
+                                <TrashAlt />
+                            </NIcon>
+                        </template>
+                        {{ t('common.confirm') }}
+                    </NButton>
                 </NFlex>
             </template>
         </NCard>
@@ -43,7 +42,7 @@
 
 <script setup lang="ts">
 import { useDomainStore, type Domain } from '@/stores/domains';
-import { NModal, NCard, NFlex, NButton, NIcon, NInput, NSpin, useNotification } from 'naive-ui'
+import { NModal, NCard, NFlex, NButton, NIcon, NInput, useNotification } from 'naive-ui'
 import { Times, TrashAlt, QuestionCircle } from '@vicons/fa';
 
 import { useI18n } from 'vue-i18n';

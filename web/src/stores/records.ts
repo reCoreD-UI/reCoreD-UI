@@ -232,5 +232,5 @@ export const useRecordStore = defineStore('records', () => {
         records.value = records.value?.filter(e => e.id !== record.id)
     }
 
-    return { records, recordsGetter, loadRecords }
+    return { records, recordsGetter, loadRecords, addRecord, updateRecord, removeRecord }
 })

@@ -49,7 +49,7 @@ const columns = [
     {
         key: '',
         render(row: Record) {
-            return <RecordOps record={row} />
+            return <RecordOps record={row} domain={props.domain} onRecord-delete={deleteRecord} />
         }
     }
 ] as DataTableColumns<Record>
@@ -70,11 +70,18 @@ onMounted(() => {
     }
 })
 
-function refreshRecords() {
-    recordStore.loadRecords(props.domain)
-    records.value = recordStore.records?.filter(e => e.record_type !== RecordTypes.RecordTypeSOA)
-    soa.value = recordStore.records?.find(e => e.record_type === RecordTypes.RecordTypeSOA)?.content as SOARecord
-    loading.value = false;
+async function refreshRecords() {
+    try {
+        await recordStore.loadRecords(props.domain)
+        records.value = recordStore.records?.filter(e => e.record_type !== RecordTypes.RecordTypeSOA)
+        soa.value = recordStore.records?.find(e => e.record_type === RecordTypes.RecordTypeSOA)?.content as SOARecord
+    } catch (err) {
+        const msg = getErrorInfo(err)
+        notification.error(msg)
+        console.error(err)
+    } finally {
+        loading.value = false;
+    }
 }
 
 function goBack() {
@@ -89,6 +96,17 @@ function searchRecord(value: string) {
     } else {
         records.value = recordStore.records?.
             filter(e => e.record_type !== RecordTypes.RecordTypeSOA)
+    }
+}
+
+async function deleteRecord(domain: string, record: Record) {
+    try {
+        await recordStore.removeRecord(domain, record)
+        records.value = recordStore.records?.filter(e => e.record_type !== RecordTypes.RecordTypeSOA)
+    } catch (err) {
+        const msg = getErrorInfo(err)
+        notification.error(msg)
+        console.error(err)
     }
 }
 </script>

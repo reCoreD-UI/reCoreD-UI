@@ -9,7 +9,8 @@ export default {
         new: 'New',
         cancel: 'Cancel',
         confirm: 'OK',
-        mandatory: 'This field is mandatory'
+        mandatory: 'This field is mandatory',
+        unitForSecond: 'Second(s)'
     },
     api: {
         error400: {
@@ -48,7 +49,6 @@ export default {
         form: {
             adminMail: 'Admin Email',
             mainDNS: 'Main DNS',
-            unitForSecond: 'Second(s)'
         },
 
         errors: {
@@ -67,5 +67,18 @@ export default {
         retry: 'Retry Interval',
         expire: 'Expiry Period',
         ttl: 'Negative TTL',
+
+        form: {
+            text: 'Text',
+            host: 'Host',
+            preference: 'Preference',
+            priority: 'Priority',
+            weight: 'Weight',
+            port: 'Port',
+            target: 'Target',
+            flag: 'Flag',
+            tag: 'Tag',
+            value: 'Value'
+        }
     }
 }

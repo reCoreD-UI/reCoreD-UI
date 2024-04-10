@@ -25,28 +25,28 @@
                 <NFormItem :label="t('records.refresh')" path="refresh_interval">
                     <NInputNumber v-model:value="domain.refresh_interval" :show-button="false">
                         <template #suffix>
-                            {{ t('domains.form.unitForSecond') }}
+                            {{ t('common.unitForSecond') }}
                         </template>
                     </NInputNumber>
                 </NFormItem>
                 <NFormItem :label="t('records.retry')" path="retry_interval">
                     <NInputNumber v-model:value="domain.retry_interval" :show-button="false">
                         <template #suffix>
-                            {{ t('domains.form.unitForSecond') }}
+                            {{ t('common.unitForSecond') }}
                         </template>
                     </NInputNumber>
                 </NFormItem>
                 <NFormItem :label="t('records.expire')" path="expiry_period">
                     <NInputNumber v-model:value="domain.expiry_period" :show-button="false">
                         <template #suffix>
-                            {{ t('domains.form.unitForSecond') }}
+                            {{ t('common.unitForSecond') }}
                         </template>
                     </NInputNumber>
                 </NFormItem>
                 <NFormItem :label="t('records.ttl')" path="negative_ttl">
                     <NInputNumber v-model:value="domain.negative_ttl" :show-button="false">
                         <template #suffix>
-                            {{ t('domains.form.unitForSecond') }}
+                            {{ t('common.unitForSecond') }}
                         </template>
                     </NInputNumber>
                 </NFormItem>
@@ -62,16 +62,16 @@
                         </template>
                         {{ t('common.cancel') }}
                     </NButton>
-                    <NSpin :show="loading">
-                        <NButton size="small" type="primary" :disabled="loading || invalidData !== allFlags" @click="confirm" attr-type="submit">
-                            <template #icon>
-                                <NIcon>
-                                    <Check />
-                                </NIcon>
-                            </template>
-                            {{ t('common.confirm') }}
-                        </NButton>
-                    </NSpin>
+
+                    <NButton size="small" type="primary" :disabled="invalidData !== allFlags" :loading="loading"
+                        @click="confirm" attr-type="submit">
+                        <template #icon>
+                            <NIcon>
+                                <Check />
+                            </NIcon>
+                        </template>
+                        {{ t('common.confirm') }}
+                    </NButton>
                 </NFlex>
             </template>
         </NCard>
@@ -92,12 +92,11 @@ import {
     NButton,
     NInput,
     NInputNumber,
-    NSpin,
     useNotification,
     type FormRules,
     type FormItemRule
 } from 'naive-ui'
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const enum validFlags {
@@ -105,7 +104,7 @@ const enum validFlags {
     mainNsValid = domainNameValid << 1,
     adminEmailValid = mainNsValid << 1
 }
-const allFlags = validFlags.adminEmailValid|validFlags.mainNsValid|validFlags.domainNameValid
+const allFlags = validFlags.adminEmailValid | validFlags.mainNsValid | validFlags.domainNameValid
 
 const { t } = useI18n()
 
@@ -133,7 +132,6 @@ const rules = {
     main_dns: [{
         required: true,
         trigger: 'blur',
-
         validator: (_rule: FormItemRule, value: string) => {
             return validate(
                 value,
@@ -173,6 +171,7 @@ const rules = {
     negative_ttl: [{
         required: true,
         trigger: 'blur',
+        type: 'number'
     }]
 } as FormRules
 
@@ -197,7 +196,7 @@ async function confirm() {
 }
 
 function validate(value: string, reg: RegExp, msg: string, flag: validFlags): Promise<void> {
-    return new Promise<void>((resolve, reject) => { 
+    return new Promise<void>((resolve, reject) => {
         if (!value) {
             invalidData.value &= ~flag
             reject(Error(t('common.mandatory')))

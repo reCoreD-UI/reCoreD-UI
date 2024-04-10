@@ -9,7 +9,8 @@ export default {
         new: '新增',
         cancel: '取消',
         confirm: '确定',
-        mandatory: '此项必填'
+        mandatory: '此项必填',
+        unitForSecond: '秒'
     },
     api: {
         error400: {
@@ -48,7 +49,6 @@ export default {
         form: {
             adminMail: '管理员邮箱',
             mainDNS: '主 DNS 服务器',
-            unitForSecond: '秒'
         },
 
         errors: {
@@ -67,5 +67,18 @@ export default {
         retry: '重试间隔',
         expire: '超期时间',
         ttl: '缓存时间',
+
+        form: {
+            text: '文本',
+            host: '主机',
+            preference: '优先级',
+            priority: '优先级',
+            weight: '权重',
+            port: '端口',
+            target: '目标',
+            flag: '标志',
+            tag: '标签',
+            value: '值'
+        }
     }
 }

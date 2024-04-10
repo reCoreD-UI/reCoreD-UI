@@ -11,7 +11,7 @@
                 </template>
                 {{ $t("common.edit") }}
             </NTooltip>
-            <NPopconfirm>
+            <NPopconfirm @positive-click="confirm">
                 <template #trigger>
                     <NButton type="error" size="tiny">
                         <template #icon>
@@ -26,12 +26,22 @@
 </template>
 
 <script setup lang="ts">
-import { NButton, NButtonGroup, NTooltip, NIcon, NPopconfirm, NFlex } from 'naive-ui'
+import { NButton, NButtonGroup, NTooltip, NIcon, NPopconfirm, NFlex, useNotification } from 'naive-ui'
 import { TrashAlt, EditRegular } from '@vicons/fa'
 import { useI18n } from 'vue-i18n';
-import type { Record } from '@/stores/records';
+import { useRecordStore, type Record } from '@/stores/records';
+import { getErrorInfo } from '@/apis/api';
 const { t } = useI18n()
+const recordStore = useRecordStore()
+const notification = useNotification()
 const props = defineProps<{
     record: Record
+    domain: string
 }>();
+
+const emit = defineEmits(['record-delete'])
+
+function confirm() {
+    emit('record-delete', props.domain, props.record)
+}
 </script>
