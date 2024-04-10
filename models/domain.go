@@ -21,13 +21,16 @@ type Domain struct {
 	NegativeTtl     uint32 `gorm:"not null,size:255,default:\"86400\"" json:"negative_ttl"`
 }
 
-func (d *Domain) EmailSOAForamt() string {
+func (d Domain) EmailSOAForamt() string {
 	s := strings.Split(d.AdminEmail, "@")
 	s[0] = strings.Replace(s[0], ".", "\\", -1)
+	if !strings.HasSuffix(s[1], ".") {
+		s[1] = fmt.Sprintf("%s.", s[1])
+	}
 	return strings.Join(s, ".")
 }
 
-func (d *Domain) WithDotEnd() string {
+func (d Domain) WithDotEnd() string {
 	if strings.HasSuffix(d.DomainName, ".") {
 		return d.DomainName
 	} else {
@@ -36,8 +39,14 @@ func (d *Domain) WithDotEnd() string {
 }
 
 func (d *Domain) GenerateSOA() dns.SOARecord {
+	var ns string
+	if !strings.HasSuffix(d.MainDNS, ".") {
+		ns = fmt.Sprintf("%s.", d.MainDNS)
+	} else {
+		ns = d.MainDNS
+	}
 	return dns.SOARecord{
-		Ns:      d.MainDNS,
+		Ns:      ns,
 		MBox:    d.EmailSOAForamt(),
 		Refresh: d.RefreshInterval,
 		Retry:   d.RetryInterval,
