@@ -8,7 +8,7 @@
 
             <NForm :model="record" inline :rules="rules">
                 <NFormItem :label="t('records.recordType')">
-                    <NSelect v-model:value="record.record_type" :options="recordTypeOptions" />
+                    <NSelect v-model:value="record.record_type" :options="recordTypeOptions" @update:value="clearRecordContent"/>
                 </NFormItem>
                 <NFormItem :label="t('records.name')" path="name">
                     <NInput v-model:value="record.name" />
@@ -121,6 +121,7 @@ import {
     type SRVRecord,
     type TXTRecord,
     type MXRecord,
+    type RecordT,
 } from '@/stores/records';
 import { Check, Times } from '@vicons/fa';
 import { ref } from 'vue';
@@ -150,6 +151,10 @@ const rules = {
         message: t('common.mandatory')
     }
 } as FormRules
+
+function clearRecordContent() {
+    props.record.content = {} as RecordT
+}
 
 async function confirm() {
     loading.value = true;
