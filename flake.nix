@@ -43,6 +43,7 @@
           buildInputs = [
             go
             nodejs
+            tokei
           ];
           GOPATH = "/home/coder/.cache/go";
         };
