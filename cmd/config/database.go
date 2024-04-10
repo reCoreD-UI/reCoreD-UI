@@ -7,23 +7,19 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var DatabaseCommand *cli.Command
+var migrationCommand = &cli.Command{
+	Name:   "migrate",
+	Usage:  "migrate database",
+	Action: migrateDatabase,
+}
 
-func init() {
-	migrationCommand := &cli.Command{
-		Name:   "migrate",
-		Usage:  "migrate database",
-		Action: migrateDatabase,
-	}
-
-	DatabaseCommand = &cli.Command{
-		Name:    "database",
-		Usage:   "database administration",
-		Aliases: []string{"db"},
-		Subcommands: []*cli.Command{
-			migrationCommand,
-		},
-	}
+var DatabaseCommand = &cli.Command{
+	Name:    "database",
+	Usage:   "database administration",
+	Aliases: []string{"db"},
+	Subcommands: []*cli.Command{
+		migrationCommand,
+	},
 }
 
 func migrateDatabase(c *cli.Context) error {

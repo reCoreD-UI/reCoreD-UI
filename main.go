@@ -2,6 +2,8 @@ package main
 
 import (
 	"os"
+	"reCoreD-UI/cmd/config"
+	"reCoreD-UI/cmd/server"
 
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -18,17 +20,14 @@ func main() {
 			Name:    "config",
 			Usage:   "config yaml file",
 			Aliases: []string{"c"},
-			Value:   "config.yaml",
 			EnvVars: []string{"RECORED_CONFIG_FILE"},
 		},
-		altsrc.NewStringSliceFlag(&cli.StringSliceFlag{}),
-		&cli.StringFlag{
+		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:     "mysql-dsn",
 			Usage:    "mysql dsn",
-			Required: true,
 			EnvVars:  []string{"RECORED_MYSQL_DSN"},
-		},
-		&cli.BoolFlag{
+		}),
+		altsrc.NewBoolFlag(&cli.BoolFlag{
 			Name:  "debug",
 			Usage: "enable debug mode",
 			Value: false,
@@ -38,16 +37,21 @@ func main() {
 				}
 				return nil
 			},
-		},
+		}),
 	}
 
 	app := &cli.App{
 		Name:  "reCoreD-UI",
 		Usage: "Web UI for CoreDNS",
+		UseShortOptionHandling: true,
 		Before: altsrc.InitInputSourceWithContext(
 			flags, altsrc.NewYamlSourceFromFlagFunc("config"),
 		),
 		Flags: flags,
+		Commands: []*cli.Command{
+			server.Command,
+			config.Command,
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
