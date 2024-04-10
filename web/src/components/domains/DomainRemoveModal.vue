@@ -25,7 +25,7 @@
                         {{ t('common.cancel') }}
                     </NButton>
 
-                    <NButton size="small" type="error" :disabled="domain_name !== domain?.domain_name"
+                    <NButton size="small" type="error" :disabled="domain_name !== domain?.domain_name" attr-type="submit"
                         :loading="loading" @click="confirm">
                         <template #icon>
                             <NIcon>

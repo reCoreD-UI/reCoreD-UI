@@ -12,6 +12,7 @@ import { getErrorInfo } from '@/apis/api'
 import { PlusSquare, RedoAlt, CheckCircle, Clock, Cogs, Search } from '@vicons/fa'
 import router from '@/router';
 import RecordOps from '@/components/records/RecordOps.vue'
+import RecordEditModal from '@/components/records/RecordEditModal.vue'
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n()
 
@@ -49,7 +50,7 @@ const columns = [
     {
         key: '',
         render(row: Record) {
-            return <RecordOps record={row} domain={props.domain} onRecord-delete={deleteRecord} />
+            return <RecordOps record={row} domain={props.domain} onRecord-delete={deleteRecord} onEdit-record={showEditing} />
         }
     }
 ] as DataTableColumns<Record>
@@ -57,8 +58,10 @@ const columns = [
 const recordStore = useRecordStore()
 const notification = useNotification()
 
-const records = ref<Record[] | undefined>([]);
+const records = ref<Record[] | undefined>([]as Record[]);
 const soa = ref<SOARecord>({} as SOARecord)
+const editModalShow = ref(false)
+const editingRecord = ref<Record>({} as Record)
 const loading = ref(true);
 onMounted(() => {
     try {
@@ -70,10 +73,13 @@ onMounted(() => {
     }
 })
 
+const reloadRecords = () => records.value = recordStore.records?.filter(e => e.record_type !== RecordTypes.RecordTypeSOA)
+
+
 async function refreshRecords() {
     try {
         await recordStore.loadRecords(props.domain)
-        records.value = recordStore.records?.filter(e => e.record_type !== RecordTypes.RecordTypeSOA)
+        reloadRecords()
         soa.value = recordStore.records?.find(e => e.record_type === RecordTypes.RecordTypeSOA)?.content as SOARecord
     } catch (err) {
         const msg = getErrorInfo(err)
@@ -102,24 +108,37 @@ function searchRecord(value: string) {
 async function deleteRecord(domain: string, record: Record) {
     try {
         await recordStore.removeRecord(domain, record)
-        records.value = recordStore.records?.filter(e => e.record_type !== RecordTypes.RecordTypeSOA)
+        reloadRecords()
     } catch (err) {
         const msg = getErrorInfo(err)
         notification.error(msg)
         console.error(err)
     }
 }
+
+function showEditing(domain: string, record: Record) {
+    editModalShow.value = true
+    editingRecord.value = record
+}
+
+function newRecord() {
+    showEditing(props.domain, {
+        zone: `${props.domain}.`,
+        ttl: 500
+    } as Record)
+}
 </script>
 
 <template>
     <div id="records">
+        <RecordEditModal v-model:show="editModalShow" :domain="domain" :record="editingRecord" @reload-records="reloadRecords"/>
         <NSpin size="large" v-if="loading" />
         <div v-else class="content">
             <NModalProvider>
                 <NPageHeader :title="t('domains.dnsRecord')" :subtitle="domain" @back="goBack">
                     <template #extra>
                         <NFlex :wrap="false" justify="end" inline>
-                            <NButton type="primary">
+                            <NButton type="primary" @click="newRecord">
                                 <template #icon>
                                     <NIcon>
                                         <PlusSquare />

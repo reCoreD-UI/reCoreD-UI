@@ -3,7 +3,7 @@
         <NButtonGroup>
             <NTooltip>
                 <template #trigger>
-                    <NButton size="tiny">
+                    <NButton size="tiny" @click="edit">
                         <template #icon>
                             <NIcon :component="EditRegular" />
                         </template>
@@ -39,9 +39,13 @@ const props = defineProps<{
     domain: string
 }>();
 
-const emit = defineEmits(['record-delete'])
+const emit = defineEmits(['record-delete', 'edit-record'])
 
 function confirm() {
     emit('record-delete', props.domain, props.record)
+}
+
+function edit() {
+    emit('edit-record', props.domain, props.record)
 }
 </script>

@@ -79,6 +79,12 @@ export default {
             flag: 'Flag',
             tag: 'Tag',
             value: 'Value'
+        },
+
+        errors: {
+            endWithDot: 'should end with a dot',
+            badIPv4: 'invalid IPv4 address',
+            badIPv6: 'invalid IPv6 address',
         }
     }
 }

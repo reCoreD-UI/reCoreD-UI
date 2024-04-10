@@ -79,6 +79,12 @@ export default {
             flag: '标志',
             tag: '标签',
             value: '值'
+        },
+
+        errors: {
+            endWithDot: '应当以 . 结尾',
+            badIPv4: '不是有效的 IPv4 地址',
+            badIPv6: '不是有效的 IPv6 地址',
         }
     }
 }
