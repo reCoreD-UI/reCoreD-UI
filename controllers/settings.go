@@ -4,18 +4,20 @@ import (
 	"reCoreD-UI/database"
 	"reCoreD-UI/models"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 const dnsSep = ","
 
 type settingsDAO struct {
-	database.BaseDAO[models.Settings]
+	database.BaseDAO[models.ISettings]
 }
 
 func SetupDNS(dns ...string) error {
 	settings := models.Settings{Key: models.SettingsKeyDNSServer, Value: strings.Join(dns, dnsSep)}
 
-	if _, err := (settingsDAO{}).UpdateOrCreate(database.Client, settings); err != nil {
+	if _, err := (settingsDAO{}).UpdateOrCreate(database.Client, &settings, models.Settings{Key: models.SettingsKeyDNSServer}); err != nil {
 		return err
 	}
 
@@ -28,10 +30,12 @@ func GetDNS() ([]string, error) {
 		return nil, err
 	}
 
-	return strings.Split(settings.Value, dnsSep), nil
+	return strings.Split(settings.(models.Settings).Value, dnsSep), nil
 }
 
 func SetupAdmin(username, password string) error {
+	logrus.Debugf("got %s:%s", username, password)
+
 	settingUsername := models.Settings{
 		Key:   models.SettingsKeyAdminUsername,
 		Value: username,
@@ -42,18 +46,17 @@ func SetupAdmin(username, password string) error {
 	}
 
 	tx := database.Client.Begin()
-	if _, err := (settingsDAO{}).UpdateOrCreate(tx, settingUsername); err != nil {
+	if _, err := (settingsDAO{}).UpdateOrCreate(tx, &settingUsername, models.Settings{Key: models.SettingsKeyAdminUsername}); err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	if _, err := (settingsDAO{}).UpdateOrCreate(tx, settingPassword); err != nil {
+	if _, err := (settingsDAO{}).UpdateOrCreate(tx, &settingPassword, models.Settings{Key: models.SettingsKeyAdminPassword}); err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	tx.Commit()
-	return nil
+	return tx.Commit().Error
 }
 
 func GetAdmin() (string, string, error) {
@@ -61,13 +64,13 @@ func GetAdmin() (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	username := settings.Value
+	username := settings.(models.Settings).Value
 
 	settings, err = (settingsDAO{}).GetOne(database.Client, models.Settings{Key: models.SettingsKeyAdminPassword})
 	if err != nil {
 		return "", "", err
 	}
-	password := settings.Value
+	password := settings.(models.Settings).Value
 
 	return username, password, nil
 }

@@ -22,7 +22,7 @@ const (
 	RecordTypeSRV   = "SRV"
 )
 
-type RecordContentDefault any
+type RecordContentDefault map[string]any
 
 type recordContentTypes interface {
 	dns.ARecord | dns.AAAARecord | dns.CNAMERecord | dns.CAARecord | dns.NSRecord | dns.MXRecord | dns.SOARecord | dns.SRVRecord | dns.TXTRecord | RecordContentDefault
@@ -30,11 +30,11 @@ type recordContentTypes interface {
 
 type Record[T recordContentTypes] struct {
 	ID         int    `gorm:"primaryKey" json:"id"`
-	Zone       string `gorm:"not null,size:255" json:"zone"`
-	Name       string `gorm:"not null,size:255" json:"name"`
+	Zone       string `gorm:"not null;size:255" json:"zone"`
+	Name       string `gorm:"not null;size:255" json:"name"`
 	Ttl        int    `json:"ttl"`
-	Content    T      `gorm:"serializer:json,type:\"text\"" json:"content"`
-	RecordType string `gorm:"not null,size:255" json:"record_type"`
+	Content    T      `gorm:"serializer:json;type:text" json:"content"`
+	RecordType string `gorm:"not null;size:255" json:"record_type"`
 }
 
 func (Record[T]) TableName() string {

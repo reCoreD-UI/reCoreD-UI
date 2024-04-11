@@ -43,7 +43,6 @@ func main() {
 	app := &cli.App{
 		Name:  "reCoreD-UI",
 		Usage: "Web UI for CoreDNS",
-		UseShortOptionHandling: true,
 		Before: altsrc.InitInputSourceWithContext(
 			flags, altsrc.NewYamlSourceFromFlagFunc("config"),
 		),

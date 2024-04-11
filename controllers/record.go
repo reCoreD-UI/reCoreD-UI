@@ -42,8 +42,8 @@ func CreateRecords(rs []models.IRecord) error {
 			return err
 		}
 	}
-	tx.Commit()
-	return nil
+	
+	return tx.Commit().Error
 }
 
 func GetRecords(cond models.IRecord) ([]models.IRecord, error) {
@@ -84,8 +84,7 @@ func DeleteRecord(domain, id string) error {
 		return err
 	}
 
-	tx.Commit()
-	return nil
+	return tx.Commit().Error
 }
 
 // for metrics

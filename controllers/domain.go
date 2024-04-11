@@ -10,7 +10,7 @@ import (
 )
 
 type domainsDAO struct {
-	database.BaseDAO[models.Domain]
+	database.BaseDAO[models.IDomain]
 }
 
 func CreateDomain(d *models.Domain) (*models.Domain, error) {
@@ -20,7 +20,7 @@ func CreateDomain(d *models.Domain) (*models.Domain, error) {
 	}
 
 	tx := database.Client.Begin()
-	if _, err := (domainsDAO{}).Create(tx, *d); err != nil {
+	if _, err := (domainsDAO{}).Create(tx, d); err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -54,21 +54,30 @@ func CreateDomain(d *models.Domain) (*models.Domain, error) {
 		}
 	}
 
-	tx.Commit()
-	return d, err
+	return d, tx.Commit().Error
 }
 
 func GetDomains(domain string) ([]models.Domain, error) {
 	if domain != "" {
-		return (domainsDAO{}).GetAll(database.Client, models.Domain{DomainName: domain})
+		r, err := (domainsDAO{}).GetAll(database.Client, models.Domain{DomainName: domain})
+		n := make([]models.Domain, 0)
+		for _, e := range r {
+			n = append(n, e.(models.Domain))
+		}
+		return n, err
 	} else {
-		return (domainsDAO{}).GetAll(database.Client, models.Domain{})
+		r, err := (domainsDAO{}).GetAll(database.Client, models.Domain{})
+		n := make([]models.Domain, 0)
+		for _, e := range r {
+			n = append(n, e.(models.Domain))
+		}
+		return n, err
 	}
 }
 
 func UpdateDomain(d *models.Domain) error {
 	tx := database.Client.Begin()
-	if _, err := (domainsDAO{}).Update(tx, *d); err != nil {
+	if _, err := (domainsDAO{}).Update(tx, d); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -98,9 +107,7 @@ func UpdateDomain(d *models.Domain) error {
 		return err
 	}
 
-	tx.Commit()
-	return nil
-
+	return tx.Commit().Error
 }
 
 func DeleteDomain(id string) error {
@@ -126,8 +133,7 @@ func DeleteDomain(id string) error {
 		return err
 	}
 
-	tx.Commit()
-	return nil
+	return tx.Commit().Error
 }
 
 // for metrics

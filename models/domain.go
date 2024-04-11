@@ -12,13 +12,13 @@ type Domain struct {
 	DomainName string `gorm:"unique,not null,size:255" json:"domain_name"`
 
 	//SOA Info
-	MainDNS         string `gorm:"not null,size:255" json:"main_dns"`
-	AdminEmail      string `gorm:"not null,size:255" json:"admin_email"`
-	SerialNumber    int64  `gorm:"not null,default:1" json:"serial_number"`
-	RefreshInterval uint32 `gorm:"not null,size:255,default:\"86400\"" json:"refresh_interval"`
-	RetryInterval   uint32 `gorm:"not null,size:255,default:\"7200\"" json:"retry_interval"`
-	ExpiryPeriod    uint32 `gorm:"not null,size:255,default:\"3600000\"" json:"expiry_period"`
-	NegativeTtl     uint32 `gorm:"not null,size:255,default:\"86400\"" json:"negative_ttl"`
+	MainDNS         string `gorm:"not null;size:255" json:"main_dns"`
+	AdminEmail      string `gorm:"not null;size:255" json:"admin_email"`
+	SerialNumber    int64  `gorm:"not null;default:1" json:"serial_number"`
+	RefreshInterval uint32 `gorm:"not null;size:255,default:\"86400\"" json:"refresh_interval"`
+	RetryInterval   uint32 `gorm:"not null;size:255,default:\"7200\"" json:"retry_interval"`
+	ExpiryPeriod    uint32 `gorm:"not null;size:255,default:\"3600000\"" json:"expiry_period"`
+	NegativeTtl     uint32 `gorm:"not null;size:255,default:\"86400\"" json:"negative_ttl"`
 }
 
 func (d Domain) EmailSOAForamt() string {
@@ -38,7 +38,7 @@ func (d Domain) WithDotEnd() string {
 	}
 }
 
-func (d *Domain) GenerateSOA() dns.SOARecord {
+func (d Domain) GenerateSOA() dns.SOARecord {
 	var ns string
 	if !strings.HasSuffix(d.MainDNS, ".") {
 		ns = fmt.Sprintf("%s.", d.MainDNS)
@@ -53,4 +53,10 @@ func (d *Domain) GenerateSOA() dns.SOARecord {
 		Expire:  d.ExpiryPeriod,
 		MinTtl:  d.NegativeTtl,
 	}
+}
+
+type IDomain interface {
+	EmailSOAForamt() string
+	WithDotEnd() string
+	GenerateSOA() dns.SOARecord
 }
