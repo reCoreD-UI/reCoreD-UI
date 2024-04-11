@@ -46,6 +46,7 @@
             tokei
           ];
           GOPATH = "/home/coder/.cache/go";
+          RECORED_MYSQL_DSN = "recoredui:A123456a-@tcp(mysql.dev:3306)/recoredui?charset=utf8mb4";
         };
 
         nixosModule = { config, pkgs, lib, ... }: with lib;
