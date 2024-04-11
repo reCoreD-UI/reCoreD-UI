@@ -1,15 +1,15 @@
 import './DomainRemoveModal.css'
 
 import { useDomainStore, type Domain } from '@/stores/domains';
-import { NModal, NCard, NFlex, NButton, NIcon, NInput, useNotification } from 'naive-ui'
+import { NModal, NCard, NFlex, NButton, NIcon, NInput, createDiscreteApi } from 'naive-ui'
 import { Times, TrashAlt, QuestionCircle } from '@vicons/fa';
 import { getErrorInfo } from '@/apis/api';
 import i18n from '@/locale/i18n';
-import type { EmitsOptions, ObjectEmitsOptions, SetupContext } from 'vue';
+import { ref, type EmitsOptions, type ObjectEmitsOptions, type SetupContext } from 'vue';
 
 const t = i18n.global.t
 const domainStore = useDomainStore()
-const notification = useNotification()
+const { notification } = createDiscreteApi(['notification'])
 
 type Props = {
     domain: Domain
@@ -20,12 +20,12 @@ type Events = {
     'update:show': (value: boolean) => void
 }
 
-let domain_name = ''
-let loading = false
+const domain_name = ref('')
+const loading = ref(false)
 
 async function confirm(domain: Domain) {
-    domain_name = ''
-    loading = true
+    domain_name.value = ''
+    loading.value = true
 
     try {
         if (domain)
@@ -35,7 +35,7 @@ async function confirm(domain: Domain) {
         notification.error(msg)
         console.error(e)
     } finally {
-        loading = false
+        loading.value = false
     }
 }
 
@@ -47,7 +47,7 @@ function modalBody({ domain }: Props) {
             <p>{t('domains.confirm1')} <b id="boldit">{domain.domain_name}</b> {t('domains.confirm2')}</p>
             <br />
             <p>
-                <NInput onUpdate:value={(v) => domain_name = v} placeholder={domain.domain_name} />
+                <NInput onUpdate:value={(v) => domain_name.value = v} placeholder={domain.domain_name} />
             </p>
         </>
     )
@@ -63,7 +63,7 @@ function modalActions({ domain }: Props, { emit }: SetupContext<Events>) {
                 }}
             </NButton>
 
-            <NButton size='small' type='error' disabled={domain_name !== domain.domain_name} attrType='submit' loading={loading} onClick={() => confirm(domain)}>
+            <NButton size='small' type='error' disabled={domain_name.value !== domain.domain_name} attrType='submit' loading={loading.value} onClick={() => confirm(domain).then(() => emit('update:show', false))}>
                 {{
                     icon: () => <NIcon><TrashAlt /></NIcon>,
                     default: () => t('common.confirm')

@@ -4,7 +4,7 @@ import { type Domain } from "../../stores/domains"
 import router from '@/router';
 import i18n from '@/locale/i18n'
 import type { SetupContext } from 'vue';
-const t = i18n.global.t
+const { t } = i18n.global
 
 type Props = {
     domain: Domain

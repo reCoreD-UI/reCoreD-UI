@@ -11,7 +11,7 @@ import { useRecordStore, type Record, type SOARecord, RecordTypes } from '@/stor
 import { getErrorInfo } from '@/apis/api'
 import { PlusSquare, RedoAlt, CheckCircle, Clock, Cogs, Search } from '@vicons/fa'
 import router from '@/router';
-import RecordOps from '@/components/records/RecordOps.vue'
+import RecordOps from '@/components/records/RecordOps'
 import RecordEditModal from '@/components/records/RecordEditModal.vue'
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n()
@@ -58,7 +58,7 @@ const columns = [
 const recordStore = useRecordStore()
 const notification = useNotification()
 
-const records = ref<Record[] | undefined>([]as Record[]);
+const records = ref<Record[] | undefined>([] as Record[]);
 const soa = ref<SOARecord>({} as SOARecord)
 const editModalShow = ref(false)
 const editingRecord = ref<Record>({} as Record)
@@ -131,7 +131,8 @@ function newRecord() {
 
 <template>
     <div id="records">
-        <RecordEditModal v-model:show="editModalShow" :domain="domain" :record="editingRecord" @reload-records="reloadRecords"/>
+        <RecordEditModal v-model:show="editModalShow" :domain="domain" :record="editingRecord"
+            @reload-records="reloadRecords" />
         <NSpin size="large" v-if="loading" />
         <div v-else class="content">
             <NModalProvider>

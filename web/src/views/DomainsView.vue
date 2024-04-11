@@ -7,7 +7,7 @@ import { getErrorInfo } from '@/apis/api'
 import DomainInfo from '@/components/domains/DomainInfo'
 import DomainOps from '@/components/domains/DomainOps'
 import DomainRemoveModal from '@/components/domains/DomainRemoveModal'
-import DomainEditModal from '@/components/domains/DomainEditModal.vue'
+import DomainEditModal from '@/components/domains/DomainEditModal'
 
 const domainStore = useDomainStore()
 const notification = useNotification()
