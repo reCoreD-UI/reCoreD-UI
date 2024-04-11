@@ -1,0 +1,11 @@
+div {
+    display: block;
+}
+
+span {
+    padding-left: 0.5em;
+}
+
+.icon {
+    transform: translateY(2px);
+}

@@ -4,9 +4,9 @@ import { PlusSquare } from "@vicons/fa"
 import { onMounted, ref } from 'vue'
 import { type Domain, useDomainStore } from '@/stores/domains'
 import { getErrorInfo } from '@/apis/api'
-import DomainInfo from '@/components/domains/DomainInfo.vue'
-import DomainOps from '@/components/domains/DomainOps.vue'
-import DomainRemoveModal from '@/components/domains/DomainRemoveModal.vue'
+import DomainInfo from '@/components/domains/DomainInfo'
+import DomainOps from '@/components/domains/DomainOps'
+import DomainRemoveModal from '@/components/domains/DomainRemoveModal'
 import DomainEditModal from '@/components/domains/DomainEditModal.vue'
 
 const domainStore = useDomainStore()
