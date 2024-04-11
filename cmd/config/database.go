@@ -26,6 +26,8 @@ func migrateDatabase(c *cli.Context) error {
 	if err := database.Connect(c.String("mysql-dsn")); err != nil {
 		return err
 	}
-
+	if c.Bool("debug") {
+		database.Client = database.Client.Debug()
+	}
 	return controllers.Migrate()
 }

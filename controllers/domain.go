@@ -59,17 +59,25 @@ func CreateDomain(d *models.Domain) (*models.Domain, error) {
 
 func GetDomains(domain string) ([]models.Domain, error) {
 	if domain != "" {
-		r, err := (domainsDAO{}).GetAll(database.Client, models.Domain{DomainName: domain})
+		r, err := (domainsDAO{}).GetAll(database.Client, &models.Domain{DomainName: domain})
 		n := make([]models.Domain, 0)
 		for _, e := range r {
-			n = append(n, e.(models.Domain))
+			i, ok := e.(*models.Domain)
+			if !ok {
+				continue
+			}
+			n = append(n, *i)
 		}
 		return n, err
 	} else {
-		r, err := (domainsDAO{}).GetAll(database.Client, models.Domain{})
+		r, err := (domainsDAO{}).GetAll(database.Client, &models.Domain{})
 		n := make([]models.Domain, 0)
 		for _, e := range r {
-			n = append(n, e.(models.Domain))
+			i, ok := e.(*models.Domain)
+			if !ok {
+				continue
+			}
+			n = append(n, *i)
 		}
 		return n, err
 	}
@@ -117,13 +125,13 @@ func DeleteDomain(id string) error {
 	}
 
 	tx := database.Client.Begin()
-	domain, err := (domainsDAO{}).GetOne(tx, models.Domain{ID: ID})
+	domain, err := (domainsDAO{}).GetOne(tx, &models.Domain{ID: ID})
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	if err := (domainsDAO{}).Delete(tx, models.Domain{ID: ID}); err != nil {
+	if err := (domainsDAO{}).Delete(tx, &models.Domain{ID: ID}); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -138,7 +146,7 @@ func DeleteDomain(id string) error {
 
 // for metrics
 func getDomainCounts() (float64, error) {
-	c, err := (domainsDAO{}).GetAll(database.Client, models.Domain{})
+	c, err := (domainsDAO{}).GetAll(database.Client, &models.Domain{})
 	if err != nil {
 		return 0, err
 	}

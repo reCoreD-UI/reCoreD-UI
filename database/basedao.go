@@ -3,7 +3,6 @@ package database
 import (
 	"errors"
 
-	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -72,20 +71,22 @@ func (BaseDAO[T]) Update(db *gorm.DB, e T, cond ...T) (T, error) {
 		tx = tx.Where(c)
 	}
 
-	if err := tx.Updates(&e).Error; err != nil {
+	result := tx.Updates(e)
+
+	if err := result.Error; err != nil {
 		return e, err
+	}
+	if result.RowsAffected == 0 {
+		return e, gorm.ErrRecordNotFound
 	}
 	return e, nil
 }
 
 func (b BaseDAO[T]) UpdateOrCreate(db *gorm.DB, e T, cond ...T) (T, error) {
-	logrus.Debugf("got %v %v %v", db, e, cond)
-	e, err := b.Update(db, e, cond...)
+	_, err := b.Update(db, e, cond...)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		logrus.Debug("will create it")
-		return b.Create(db, e)
+		_, err = b.Create(db, e)
 	}
-	logrus.Debugf("return %v %v", e, err)
 	return e, err
 }
 

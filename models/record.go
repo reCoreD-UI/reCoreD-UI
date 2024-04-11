@@ -37,23 +37,23 @@ type Record[T recordContentTypes] struct {
 	RecordType string `gorm:"not null;size:255" json:"record_type"`
 }
 
-func (Record[T]) TableName() string {
+func (*Record[T]) TableName() string {
 	return "coredns_record"
 }
 
-func (r Record[T]) CheckZone() error {
+func (r *Record[T]) CheckZone() error {
 	if strings.HasSuffix(r.Zone, ".") {
 		return ErrorZoneNotEndWithDot
 	}
 	return nil
 }
 
-func (r Record[T]) WithOutDotTail() string {
+func (r *Record[T]) WithOutDotTail() string {
 	return strings.TrimRight(r.Zone, ".")
 }
 
-func (r Record[T]) ToEntity() IRecord {
-	return &r
+func (r *Record[T]) ToEntity() IRecord {
+	return r
 }
 
 func (r *Record[T]) FromEntity(entity any) error {
@@ -65,7 +65,7 @@ func (r *Record[T]) FromEntity(entity any) error {
 	return json.Unmarshal(b, r)
 }
 
-func (r Record[T]) GetType() string {
+func (r *Record[T]) GetType() string {
 	return r.RecordType
 }
 

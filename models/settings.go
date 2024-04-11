@@ -18,7 +18,7 @@ type Settings struct {
 	Value string `gorm:"not null;size:255"`
 }
 
-func (s Settings) String() string {
+func (s *Settings) String() string {
 	return fmt.Sprintf("%s: %s", s.Key, s.Value)
 }
 
