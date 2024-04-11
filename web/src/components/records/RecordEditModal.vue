@@ -186,6 +186,30 @@ const rules = {
                 return new Error(t('common.mandatory'))
             }
 
+            if (props.record.name.includes(' ')) {
+                invalidData.value &= ~validationFlags.name
+                return new Error(t('records.errors.hasSpace'))
+            }
+
+            if (props.record.name.startsWith('.') || props.record.name.endsWith('.')) {
+                invalidData.value &= ~validationFlags.name
+                return new Error(t('records.errors.badName.dotAndMinus'))
+            }
+
+            if (props.record.name.startsWith('-') || props.record.name.endsWith('-')) {
+                invalidData.value &= ~validationFlags.name
+                return new Error(t('records.errors.badName.dotAndMinus'))
+            }
+
+            if (props.record.name.includes('..')) {
+                invalidData.value &= ~validationFlags.name
+                return new Error(t('records.errors.badName.doubleDots'))
+            }
+
+            if (props.record.name.split('.').filter(e => e.length > 63).length > 0) {
+                invalidData.value &= ~validationFlags.name
+                return new Error(t('records.errors.badName.longerThan63'))
+            }
             return true
         }
     },
@@ -216,6 +240,10 @@ const rules = {
                 return new Error(t('common.mandatory'))
             }
 
+            if (r.host.includes(' ')) {
+                invalidData.value &= ~validationFlags.content
+                return new Error(t('records.errors.hasSpace'))
+            }
 
             if (!r.host.endsWith('.')) {
                 invalidData.value &= ~validationFlags.content
@@ -268,6 +296,11 @@ const rules = {
                 return new Error(t('common.mandatory'))
             }
 
+            if (r.host.includes(' ')) {
+                invalidData.value &= ~validationFlags.content
+                return new Error(t('records.errors.hasSpace'))
+            }
+
             if (!r.host.endsWith('.')) {
                 invalidData.value &= ~validationFlags.content
                 return new Error(t('records.errors.endWithDot'))
@@ -288,6 +321,11 @@ const rules = {
                 return new Error(t('common.mandatory'))
             }
 
+            if (r.target.includes(' ')) {
+                invalidData.value &= ~validationFlags.content
+                return new Error(t('records.errors.hasSpace'))
+            }
+
             if (!r.target.endsWith('.')) {
                 invalidData.value &= ~validationFlags.content
                 return new Error(t('records.errors.endWithDot'))
@@ -306,6 +344,11 @@ const rules = {
             if (!r || !r.flag || !r.tag || r.tag === '' || !r.value || r.value === '') {
                 invalidData.value &= ~validationFlags.content
                 return new Error(t('common.mandatory'))
+            }
+
+            if (r.tag.includes(' ')) {
+                invalidData.value &= ~validationFlags.content
+                return new Error(t('records.errors.hasSpace'))
             }
 
             return true

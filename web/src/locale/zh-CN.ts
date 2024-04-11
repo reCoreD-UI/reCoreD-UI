@@ -58,7 +58,7 @@ export default {
     },
     records: {
         '_': '记录',
-        name: '记录名',
+        name: '资源记录',
         recordType: '类型',
         content: '记录值',
         search: '搜索...',
@@ -83,8 +83,14 @@ export default {
 
         errors: {
             endWithDot: '应当以 . 结尾',
+            hasSpace: '不能有空格',
             badIPv4: '不是有效的 IPv4 地址',
             badIPv6: '不是有效的 IPv6 地址',
+            badName: {
+                dotAndMinus: '资源记录不能以 "."、"-" 开头或结尾',
+                doubleDots: '资源记录不能有连续的 "."',
+                logerThan63: '资源记录以 "." 分割的每个字符串长度不能超过63字符'
+            }
         }
     }
 }

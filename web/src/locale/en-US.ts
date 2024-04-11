@@ -58,7 +58,7 @@ export default {
     },
     records: {
         '_': 'Record',
-        name: 'Record Name',
+        name: 'Resource Record',
         recordType: 'Type',
         content: 'Record',
         search: 'Search...',
@@ -83,8 +83,14 @@ export default {
 
         errors: {
             endWithDot: 'should end with a dot',
+            hasSpace: 'shoule have no space',
             badIPv4: 'invalid IPv4 address',
             badIPv6: 'invalid IPv6 address',
+            badName: {
+                dotAndMinus: 'should not start or end with "." "-"',
+                doubleDots: 'should have no contianus "."',
+                logerThan63: 'should not longer than 63 characters splited by "."'
+            }
         }
     }
 }
