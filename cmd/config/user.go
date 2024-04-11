@@ -20,7 +20,7 @@ var UserCommand = &cli.Command{
 			EnvVars: []string{"RECORED_ADMIN_USERNAME"},
 		}),
 		altsrc.NewStringFlag(&cli.StringFlag{
-			Name:     "passowrd",
+			Name:     "password",
 			Aliases:  []string{"p"},
 			Required: true,
 			Usage:    "admin password",
