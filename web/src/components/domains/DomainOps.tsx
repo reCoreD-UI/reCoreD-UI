@@ -76,4 +76,15 @@ function DomainOps({ domain }: Props, { emit }: SetupContext<Events>) {
     )
 }
 
+DomainOps.props = {
+    domain: {
+        required: true
+    }
+}
+
+DomainOps.emits = {
+    removeDomain: (d:Domain) => d,
+    editDomain: (d:Domain) => d
+} as Events
+
 export default DomainOps
