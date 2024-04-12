@@ -90,6 +90,7 @@ const rules = {
 type Props = {
     domain: Domain
     show: boolean
+    'onUpdate:show': (v: boolean) => void
 }
 
 type Events = {
@@ -202,7 +203,7 @@ function modalActions({ domain }: Props, { emit }: SetupContext<Events>) {
     )
 }
 
-function DomainEditModal({ domain, show }: Props, { emit }: SetupContext<Events>) {
+function DomainEditModal({ domain, show, }: Props, { emit }: SetupContext<Events>) {
     return (
         <NModal maskClosable={false} show={show}>
             <NCard style={{ width: '640px' }} role='dialog'>

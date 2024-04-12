@@ -45,6 +45,8 @@ type Props = {
     record: Record
     domain: string
     show: boolean
+    'onReloadRecords': () => void
+    'onUpdate:show': (v: boolean) => void
 }
 
 type Events = {
@@ -273,7 +275,7 @@ function buildRules(record: Record): FormRules {
     }
 }
 
-async function confirm({ record, domain }: Props) {
+async function confirm(record: Record, domain: string) {
     loading.value = true;
     try {
         if (!record.id || record.id < 1) {
@@ -292,7 +294,7 @@ async function confirm({ record, domain }: Props) {
 function modalHeader({ record }: Props) {
     return (
         <>
-            {(!record || !record.id || record.id < 1) ? <span>{t('common.new')}</span> : <span> t('common.edit')</span>}
+            {(!record || !record.id || record.id < 1) ? <span>{t('common.new')}</span> : <span> {t('common.edit')}</span>}
             <span>{t('records._')}</span>
         </>
     )
@@ -310,7 +312,7 @@ function modalActions({ record, domain }: Props, { emit }: SetupContext<Events>)
 
             <NButton size='small' type='primary' loading={loading.value} attrType='submit'
                 disabled={invalidData.value !== (validationFlags.content | validationFlags.name)}
-                onClick={() => confirm({ record, domain, show: false }).then(() => { emit('reloadRecords'); emit('update:show', false) })}>
+                onClick={() => confirm(record, domain).then(() => { emit('reloadRecords'); emit('update:show', false) })}>
                 {{
                     icon: () => <NIcon component={Check} />,
                     default: () => t('common.confirm')

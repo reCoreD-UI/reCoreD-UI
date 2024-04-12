@@ -8,6 +8,8 @@ const { t } = i18n.global
 type Props = {
     record: Record
     domain: string
+    onRecordDelete: (domain: string, record: Record) => void
+    onEditRecord: (domain: string, record: Record) => void
 }
 
 type Events = {

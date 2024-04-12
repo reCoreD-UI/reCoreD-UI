@@ -8,6 +8,8 @@ const { t } = i18n.global
 
 type Props = {
     domain: Domain
+    onRemoveDomain: (d: Domain) => void
+    onEditDomain: (d: Domain) => void
 }
 
 type Events = {
@@ -83,8 +85,8 @@ DomainOps.props = {
 }
 
 DomainOps.emits = {
-    removeDomain: (d:Domain) => d,
-    editDomain: (d:Domain) => d
+    removeDomain: (d: Domain) => d,
+    editDomain: (d: Domain) => d
 } as Events
 
 export default DomainOps

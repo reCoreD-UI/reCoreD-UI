@@ -14,6 +14,7 @@ const { notification } = createDiscreteApi(['notification'])
 type Props = {
     domain: Domain
     show: boolean
+    'onUpdate:show': (value: boolean) => void
 }
 
 type Events = {
