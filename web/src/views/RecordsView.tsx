@@ -118,7 +118,7 @@ const generateColumns = (domain: string) => [
     {
         key: '',
         render(row: Record) {
-            return <RecordOps record={row} domain={domain} onRecord-delete={deleteRecord} onEdit-record={showEditing} />
+            return <RecordOps record={row} domain={domain} onRecordDelete={deleteRecord} onEditRecord={showEditing} />
         }
     }
 ] as DataTableColumns<Record>
@@ -238,7 +238,7 @@ function RecordsView({ domain }: Props) {
     }
     return (
         <div id='records'>
-            <RecordEditModal show={editModalShow.value} domain={domain} record={editingRecord.value} onReloadRecords={reloadRecords} />
+            <RecordEditModal show={editModalShow.value} domain={domain} record={editingRecord.value} onReloadRecords={reloadRecords} onUpdate:show={(v: boolean) => editModalShow.value = v} />
             {
                 loading.value ? <NSpin size='large' /> : <recordsViewBody domain={domain} />
             }

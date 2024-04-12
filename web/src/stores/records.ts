@@ -82,8 +82,8 @@ const recordDevData = new Map<string, Record[]>([
                 ttl: 3600,
                 record_type: RecordTypes.RecordTypeSOA,
                 content: {
-                    ns: "ns1.example.com",
-                    MBox: "admin@example.com",
+                    ns: "ns1.example.com.",
+                    MBox: "admin@example.com.",
                     refresh: 86400,
                     retry: 7200,
                     expire: 3600000,
@@ -97,7 +97,7 @@ const recordDevData = new Map<string, Record[]>([
                 ttl: 3600,
                 record_type: RecordTypes.RecordTypeNS,
                 content: {
-                    host: "ns1.example.com"
+                    host: "ns1.example.com."
                 }
             },
             {
@@ -107,7 +107,7 @@ const recordDevData = new Map<string, Record[]>([
                 ttl: 3600,
                 record_type: RecordTypes.RecordTypeNS,
                 content: {
-                    host: "ns2.example.com"
+                    host: "ns2.example.com."
                 }
             },
             {
@@ -127,7 +127,7 @@ const recordDevData = new Map<string, Record[]>([
                 ttl: 3600,
                 record_type: RecordTypes.RecordTypeCNAME,
                 content: {
-                    host: "www.example.com"
+                    host: "www.example.com."
                 }
             }
         ]
@@ -141,8 +141,8 @@ const recordDevData = new Map<string, Record[]>([
                 ttl: 3600,
                 record_type: RecordTypes.RecordTypeSOA,
                 content: {
-                    ns: "ns1.example.org",
-                    MBox: "admin@example.org",
+                    ns: "ns1.example.org.",
+                    MBox: "admin@example.org.",
                     refresh: 86400,
                     retry: 7200,
                     expire: 3600000,
@@ -156,7 +156,7 @@ const recordDevData = new Map<string, Record[]>([
                 ttl: 3600,
                 record_type: RecordTypes.RecordTypeNS,
                 content: {
-                    host: "ns1.example.org"
+                    host: "ns1.example.org."
                 }
             },
             {
@@ -166,7 +166,7 @@ const recordDevData = new Map<string, Record[]>([
                 ttl: 3600,
                 record_type: RecordTypes.RecordTypeNS,
                 content: {
-                    host: "ns2.example.org"
+                    host: "ns2.example.org."
                 }
             },
             {
@@ -186,7 +186,7 @@ const recordDevData = new Map<string, Record[]>([
                 ttl: 3600,
                 record_type: RecordTypes.RecordTypeCNAME,
                 content: {
-                    host: "www.example.org"
+                    host: "www.example.org."
                 }
             }
         ]

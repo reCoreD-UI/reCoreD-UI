@@ -65,7 +65,7 @@ export const useDomainStore = defineStore('domains', () => {
             await api.put("/domains", domain)
         }
 
-        domains.value = domains.value.map(e => e.id === domain.id ? domain : e)
+        domains.value = domains.value.map(e => (e.id === domain.id || e.domain_name === domain.domain_name) ? domain : e)
     }
 
     async function removeDomain(domain: Domain) {
