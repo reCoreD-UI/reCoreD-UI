@@ -10,8 +10,8 @@ import (
 )
 
 func getRecords(c *gin.Context) {
-	query := models.Record[models.RecordContentDefault]{}
-	if err := c.BindQuery(&query); err != nil {
+	query := &models.Record[models.RecordContentDefault]{Content: make(models.RecordContentDefault)}
+	if err := c.BindQuery(query); err != nil {
 		c.JSON(http.StatusBadRequest, Response{
 			Succeed: false,
 			Message: err.Error(),
@@ -21,7 +21,7 @@ func getRecords(c *gin.Context) {
 	domain := c.Param("domain")
 	query.Zone = fmt.Sprintf("%s.", domain)
 
-	records, err := controllers.GetRecords(&query)
+	records, err := controllers.GetRecords(query)
 	if err != nil {
 		errorHandler(c, err)
 		return
@@ -34,7 +34,7 @@ func getRecords(c *gin.Context) {
 }
 
 func createRecord(c *gin.Context) {
-	record := &models.Record[models.RecordContentDefault]{}
+	record := &models.Record[models.RecordContentDefault]{Content: make(models.RecordContentDefault)}
 	if err := c.BindJSON(record); err != nil {
 		c.JSON(http.StatusBadRequest, Response{
 			Succeed: false,
@@ -65,7 +65,7 @@ func createRecord(c *gin.Context) {
 }
 
 func createRecords(c *gin.Context) {
-	var records []models.IRecord
+	var records []models.Record[models.RecordContentDefault]
 	if err := c.BindJSON(&records); err != nil {
 		c.JSON(http.StatusBadRequest, Response{
 			Succeed: false,
@@ -74,7 +74,12 @@ func createRecords(c *gin.Context) {
 		return
 	}
 
-	if err := controllers.CreateRecords(records); err != nil {
+	var iRecords []models.IRecord
+	for _, v := range records {
+		iRecords = append(iRecords, &v)
+	}
+
+	if err := controllers.CreateRecords(iRecords); err != nil {
 		errorHandler(c, err)
 		return
 	}
@@ -85,7 +90,7 @@ func createRecords(c *gin.Context) {
 }
 
 func updateRecord(c *gin.Context) {
-	record := &models.Record[models.RecordContentDefault]{}
+	record := &models.Record[models.RecordContentDefault]{Content: make(models.RecordContentDefault)}
 	if err := c.BindJSON(record); err != nil {
 		c.JSON(http.StatusBadRequest, Response{
 			Succeed: false,
