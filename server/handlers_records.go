@@ -9,6 +9,68 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func validateRecord(r models.IRecord) error {
+
+	switch r.GetType() {
+	case models.RecordTypeA:
+		record := &models.Record[models.ARecord]{}
+		if err := record.FromEntity(r); err != nil {
+			return err
+		}
+		return record.Content.Validate()
+	case models.RecordTypeAAAA:
+		record := &models.Record[models.AAAARecord]{}
+		if err := record.FromEntity(r); err != nil {
+			return err
+		}
+		return record.Content.Validate()
+	case models.RecordTypeCNAME:
+		record := &models.Record[models.CNAMERecord]{}
+		if err := record.FromEntity(r); err != nil {
+			return err
+		}
+		return record.Content.Validate()
+	case models.RecordTypeCAA:
+		record := &models.Record[models.CAARecord]{}
+		if err := record.FromEntity(r); err != nil {
+			return err
+		}
+		return record.Content.Validate()
+	case models.RecordTypeMX:
+		record := &models.Record[models.MXRecord]{}
+		if err := record.FromEntity(r); err != nil {
+			return err
+		}
+		return record.Content.Validate()
+	case models.RecordTypeNS:
+		record := &models.Record[models.NSRecord]{}
+		if err := record.FromEntity(r); err != nil {
+			return err
+		}
+		return record.Content.Validate()
+	case models.RecordTypeSOA:
+		record := &models.Record[models.SOARecord]{}
+		if err := record.FromEntity(r); err != nil {
+			return err
+		}
+		return record.Content.Validate()
+	case models.RecordTypeSRV:
+		record := &models.Record[models.SRVRecord]{}
+		if err := record.FromEntity(r); err != nil {
+			return err
+		}
+		return record.Content.Validate()
+	case models.RecordTypeTXT:
+		record := &models.Record[models.TXTRecord]{}
+		if err := record.FromEntity(r); err != nil {
+			return err
+		}
+		return record.Content.Validate()
+	default:
+		return models.ErrInvalidType
+	}
+}
+
 func getRecords(c *gin.Context) {
 	query := &models.Record[models.RecordContentDefault]{Content: make(models.RecordContentDefault)}
 	if err := c.BindQuery(query); err != nil {
@@ -48,6 +110,14 @@ func createRecord(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, Response{
 			Succeed: false,
 			Message: "request body doesn't match URI",
+		})
+		return
+	}
+
+	if err := validateRecord(record); err != nil {
+		c.JSON(http.StatusBadRequest, Response{
+			Succeed: false,
+			Message: err.Error(),
 		})
 		return
 	}
@@ -92,6 +162,14 @@ func createRecords(c *gin.Context) {
 func updateRecord(c *gin.Context) {
 	record := &models.Record[models.RecordContentDefault]{Content: make(models.RecordContentDefault)}
 	if err := c.BindJSON(record); err != nil {
+		c.JSON(http.StatusBadRequest, Response{
+			Succeed: false,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	if err := validateRecord(record); err != nil {
 		c.JSON(http.StatusBadRequest, Response{
 			Succeed: false,
 			Message: err.Error(),

@@ -5,8 +5,6 @@ import (
 	"reCoreD-UI/database"
 	"reCoreD-UI/models"
 	"strconv"
-
-	dns "github.com/cloud66-oss/coredns_mysql"
 )
 
 type domainsDAO struct {
@@ -25,7 +23,7 @@ func CreateDomain(d *models.Domain) (*models.Domain, error) {
 		return nil, err
 	}
 
-	r := &models.Record[dns.SOARecord]{}
+	r := &models.Record[models.SOARecord]{}
 	r.Zone = d.WithDotEnd()
 	r.Name = "@"
 	r.RecordType = models.RecordTypeSOA
@@ -41,7 +39,7 @@ func CreateDomain(d *models.Domain) (*models.Domain, error) {
 	}
 
 	for i, ns := range nss {
-		record := &models.Record[dns.NSRecord]{
+		record := &models.Record[models.NSRecord]{
 			Zone:       d.WithDotEnd(),
 			RecordType: models.RecordTypeSOA,
 			Name:       fmt.Sprintf("ns%d", i+1),
@@ -98,7 +96,7 @@ func UpdateDomain(d *models.Domain) error {
 		return err
 	}
 
-	r := &models.Record[dns.SOARecord]{}
+	r := &models.Record[models.SOARecord]{}
 	if err := r.FromEntity(soa); err != nil {
 		tx.Rollback()
 		return err

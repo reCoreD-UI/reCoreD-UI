@@ -3,8 +3,6 @@ package models
 import (
 	"fmt"
 	"strings"
-
-	dns "github.com/cloud66-oss/coredns_mysql"
 )
 
 type Domain struct {
@@ -38,25 +36,25 @@ func (d *Domain) WithDotEnd() string {
 	}
 }
 
-func (d *Domain) GenerateSOA() dns.SOARecord {
+func (d *Domain) GenerateSOA() SOARecord {
 	var ns string
 	if !strings.HasSuffix(d.MainDNS, ".") {
 		ns = fmt.Sprintf("%s.", d.MainDNS)
 	} else {
 		ns = d.MainDNS
 	}
-	return dns.SOARecord{
-		Ns:      ns,
-		MBox:    d.EmailSOAForamt(),
-		Refresh: d.RefreshInterval,
-		Retry:   d.RetryInterval,
-		Expire:  d.ExpiryPeriod,
-		MinTtl:  d.NegativeTtl,
-	}
+	r := SOARecord{}
+	r.Ns = ns
+	r.MBox = d.EmailSOAForamt()
+	r.Refresh = d.RefreshInterval
+	r.Retry = d.RetryInterval
+	r.Expire = d.ExpiryPeriod
+	r.MinTtl = d.NegativeTtl
+	return r
 }
 
 type IDomain interface {
 	EmailSOAForamt() string
 	WithDotEnd() string
-	GenerateSOA() dns.SOARecord
+	GenerateSOA() SOARecord
 }

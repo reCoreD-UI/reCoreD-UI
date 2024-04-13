@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"strings"
-
-	dns "github.com/cloud66-oss/coredns_mysql"
 )
 
 var ErrorZoneNotEndWithDot = errors.New("zone should end with '.'")
@@ -22,10 +20,8 @@ const (
 	RecordTypeSRV   = "SRV"
 )
 
-type RecordContentDefault map[string]any
-
 type recordContentTypes interface {
-	dns.ARecord | dns.AAAARecord | dns.CNAMERecord | dns.CAARecord | dns.NSRecord | dns.MXRecord | dns.SOARecord | dns.SRVRecord | dns.TXTRecord | RecordContentDefault
+	ARecord | AAAARecord | CNAMERecord | CAARecord | NSRecord | MXRecord | SOARecord | SRVRecord | TXTRecord | RecordContentDefault
 }
 
 type Record[T recordContentTypes] struct {
