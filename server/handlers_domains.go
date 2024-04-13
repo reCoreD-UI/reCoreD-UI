@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetDomains
 func getDomains(c *gin.Context) {
 	domains, err := controllers.GetDomains("")
 	if err != nil {

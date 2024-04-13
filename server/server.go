@@ -13,6 +13,7 @@ type Server struct {
 	webServer *gin.Engine
 	listen    string
 	prefix    string
+	debug     bool
 }
 
 func NewServer(c *cli.Context) (*Server, error) {
@@ -30,6 +31,7 @@ func NewServer(c *cli.Context) (*Server, error) {
 			c.String("port"),
 		),
 		prefix: c.String("prefix"),
+		debug:  c.Bool("debug"),
 	}, nil
 }
 

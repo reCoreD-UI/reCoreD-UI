@@ -4,6 +4,7 @@ import (
 	"os"
 	"reCoreD-UI/cmd/config"
 	"reCoreD-UI/cmd/server"
+	_ "reCoreD-UI/docs"
 
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -23,9 +24,9 @@ func main() {
 			EnvVars: []string{"RECORED_CONFIG_FILE"},
 		},
 		altsrc.NewStringFlag(&cli.StringFlag{
-			Name:     "mysql-dsn",
-			Usage:    "mysql dsn",
-			EnvVars:  []string{"RECORED_MYSQL_DSN"},
+			Name:    "mysql-dsn",
+			Usage:   "mysql dsn",
+			EnvVars: []string{"RECORED_MYSQL_DSN"},
 		}),
 		altsrc.NewBoolFlag(&cli.BoolFlag{
 			Name:  "debug",

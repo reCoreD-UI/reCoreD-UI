@@ -1,6 +1,7 @@
 package server
 
 import (
+	"net/http"
 	"path"
 	"reCoreD-UI/controllers"
 	"strings"
@@ -8,11 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 const (
-	apiPrefix    = "/api"
-	metricPrefix = "/metrics"
+	apiPrefix     = "/api"
+	metricPrefix  = "/metrics"
+	swaggerPrefix = "/swagger"
 )
 
 func (s *Server) setupRoute() {
@@ -20,6 +24,9 @@ func (s *Server) setupRoute() {
 	if err != nil {
 		logrus.Fatal(err)
 	}
+
+	swaggerHandler := gin.New()
+	swaggerHandler.GET(path.Join(swaggerPrefix, "*any"), ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	metricHandler := gin.New()
 	metricHandler.GET(metricPrefix, func(ctx *gin.Context) {
@@ -59,6 +66,12 @@ func (s *Server) setupRoute() {
 			apiHandler.HandleContext(ctx)
 		case strings.HasPrefix(uri, path.Join(s.prefix, metricPrefix)):
 			metricHandler.HandleContext(ctx)
+		case strings.HasPrefix(uri, path.Join(s.prefix, swaggerPrefix)):
+			if s.debug {
+				swaggerHandler.HandleContext(ctx)
+			} else {
+				ctx.HTML(http.StatusNotFound, "", nil)
+			}
 		default:
 			staticFileHandler()(ctx)
 		}
