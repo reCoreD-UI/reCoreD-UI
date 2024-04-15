@@ -1,11 +1,7 @@
-div {
-    display: block;
+.icon-info {
+    transform: translateY(1px);
 }
 
-span {
+span.info {
     padding-left: 0.5em;
-}
-
-.icon {
-    transform: translateY(2px);
 }

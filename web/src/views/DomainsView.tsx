@@ -1,87 +1,102 @@
 import './DomainsView.css'
+import { Domain, useDomainStore } from '../stores/domains'
+import { useEffect, useState } from 'react'
+import { App, Button, Card, Space, Spin } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
 
-import { NSpin, NFlex, NCard, NButton, NIcon, NModalProvider, createDiscreteApi } from 'naive-ui'
-import { PlusSquare } from "@vicons/fa"
-import { type Domain, useDomainStore } from '@/stores/domains'
-import { getErrorInfo } from '@/apis/api'
-import DomainInfo from '@/components/domains/DomainInfo'
-import DomainOps from '@/components/domains/DomainOps'
-import DomainRemoveModal from '@/components/domains/DomainRemoveModal'
-import DomainEditModal from '@/components/domains/DomainEditModal'
-import { ref } from 'vue'
+import { useNavigate } from 'react-router-dom'
+import DomainDeleteModal from '../components/domains/DomainDeleteModal'
+import DomainCard from '../components/domains/DomainCard'
+import DomainEditModal from '../components/domains/DomainEditModal'
+import { ResponseError, getErrorInfo } from '../api'
 
-const domainStore = useDomainStore()
-const { notification } = createDiscreteApi(['notification'])
+const emptyDomain: Domain = { domain_name: '' }
 
-const loading = ref(true);
-const removeModalShow = ref(false);
-const editModalShow = ref(false);
-const operationDomain = ref({} as Domain)
+export default function DomainsView() {
+    const [loading, setLoading] = useState(true)
+    const [deleteModalShow, setDeleteModalShow] = useState(false)
+    const [editModalShow, setEditModalShow] = useState(false)
+    const [currentDomain, setCurrentDomain] = useState(emptyDomain)
+    const { notification } = App.useApp()
+    const domainStore = useDomainStore()
+    const go = useNavigate()
 
-function showRemoveModal(domain: Domain) {
-    operationDomain.value = domain
-    removeModalShow.value = true
-}
-
-function showEditModal(domain: Domain) {
-    operationDomain.value = domain
-    editModalShow.value = true
-}
-
-function addDomain() {
-    const domain = {
-        refresh_interval: 86400,
-        retry_interval: 7200,
-        expiry_period: 3600000,
-        negative_ttl: 86400,
-        serial_number: 1,
-    } as Domain
-    showEditModal(domain)
-}
-
-function DomainsView() {
-    try {
-        domainStore.loadDomains()
-        loading.value = false
-    } catch (e) {
-        const msg = getErrorInfo(e)
-        notification.error(msg)
-        console.error(e)
+    function openDeleteModal(domain: Domain) {
+        setCurrentDomain(domain)
+        setDeleteModalShow(true)
     }
+
+    function closeDeleteModdal() {
+        setDeleteModalShow(false)
+    }
+
+    function openEditModal(domain: Domain) {
+        setCurrentDomain(domain)
+        setEditModalShow(true)
+    }
+
+    function closeEditModal() {
+        setEditModalShow(false)
+    }
+
+    function newDomain() {
+        openEditModal({
+            domain_name: '',
+            admin_email: '',
+            main_dns: '',
+            refresh_interval: 86400,
+            retry_interval: 7200,
+            expiry_period: 3600000,
+            negative_ttl: 86400,
+            serial_number: 1,
+        })
+    }
+
+    // called once only.
+    useEffect(() => {
+        domainStore.loadDomains().then(() => setLoading(false)).catch(e => {
+            const msg = getErrorInfo(e as ResponseError)
+            notification.error(msg)
+            console.error(e)
+        })
+    }, [])
+
     return (
         <>
             {
-                loading.value ? <NSpin size="large" /> :
-                    <NModalProvider>
-                        <NFlex vertical>
+                loading ? <Spin size='large' /> :
+                    <>
+                        <Space direction="vertical" >
                             {
-                                domainStore.domains.map((domain: Domain) => (
-                                    <NCard title={domain.domain_name} key={domain.id} size='large' hoverable>
-                                        {{
-                                            default: () => <DomainInfo domain={domain} />,
-                                            action: () => <DomainOps domain={domain} onRemoveDomain={showRemoveModal} onEditDomain={showEditModal} />
-                                        }}
-
-                                    </NCard>
+                                domainStore.domains.map(e => (
+                                    <DomainCard domain={e}
+                                        onDeleteClick={() => openDeleteModal(e)}
+                                        onRecordClick={() => go(`/records/${e.domain_name}`)}
+                                        onEditClick={() => openEditModal(e)}
+                                        key={e.id}
+                                    />
                                 ))
                             }
-
-                            <NCard hoverable>
-                                <NButton block quaternary size="large" onClick={addDomain}>
-                                    {{
-                                        icon: () => <NIcon component={PlusSquare} depth={5} />
-                                    }}
-                                </NButton>
-                            </NCard>
-                        </NFlex>
-                        <DomainRemoveModal show={removeModalShow.value} domain={operationDomain.value} onUpdate:show={(v: boolean) => removeModalShow.value = v} />
-                        <DomainEditModal show={editModalShow.value} domain={operationDomain.value} onUpdate:show={(v: boolean) => editModalShow.value = v} />
-                    </NModalProvider>
+                            <Card>
+                                <Button icon={<PlusOutlined className='icon' />}
+                                    block type="text" onClick={newDomain} />
+                            </Card>
+                        </Space>
+                        <DomainDeleteModal open={deleteModalShow}
+                            onCancel={closeDeleteModdal}
+                            onOk={closeDeleteModdal}
+                            domain={currentDomain}
+                            removeDomain={domainStore.removeDomain}
+                        />
+                        <DomainEditModal open={editModalShow}
+                            onCancel={closeEditModal}
+                            onOk={closeEditModal}
+                            domain={currentDomain}
+                            editDomain={domainStore.updateDomain}
+                            createDomain={domainStore.addDomain}
+                        />
+                    </>
             }
         </>
     )
 }
-
-DomainsView.displayName = 'DomainsView'
-
-export default DomainsView

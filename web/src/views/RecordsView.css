@@ -1,7 +1,38 @@
-div#records {
-    position: absolute;
+.records-layout {
+    position: fixed;
+    display: block;
     top: 0;
     left: 0;
     width: 100vw;
-    padding: 1.5rem;
+    height: 100vh;
+    text-align: left;
+}
+
+.toolbar {
+    padding-top: 1em;
+}
+
+.right {
+    position:absolute ;
+    right: 64px;
+}
+
+.records-layout-header {
+    background-color: var(--records-layout-header-bgcolor);
+    align-items: center;
+}
+
+.display-as-inline {
+    display:inline-block;
+    margin: 0 !important;
+}
+
+h1.title {
+    font-weight:normal;
+    font-size: 14pt;
+}
+
+h2.subtitle {
+    font-weight:normal;
+    font-size: 12pt;
 }

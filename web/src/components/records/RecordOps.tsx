@@ -1,49 +1,26 @@
-import { NButton, NButtonGroup, NTooltip, NIcon, NPopconfirm, NFlex } from 'naive-ui'
-import { TrashAlt, EditRegular } from '@vicons/fa'
-import type { Record } from '@/stores/records'
-import i18n from '@/locale/i18n'
-import type { SetupContext } from 'vue'
-const { t } = i18n.global
+import { Button, Flex, Popconfirm, Tooltip } from "antd"
+import { DeleteOutlined, EditFilled } from "@ant-design/icons"
+import i18n from '../../locale'
+
+const { t } = i18n
 
 type Props = {
-    record: Record
-    domain: string
-    onRecordDelete: (domain: string, record: Record) => void
-    onEditRecord: (domain: string, record: Record) => void
+    onEdit(): void
+    onDelete(): void
 }
 
-type Events = {
-    recordDelete(domain: string, record: Record): void
-    editRecord(domain: string, record: Record): void
-}
-
-function RecordOps({ record, domain }: Props, { emit }: SetupContext<Events>) {
+export default function RecordOps({ onEdit, onDelete }: Props) {
     return (
-        <NFlex justify='end'>
-            <NButtonGroup>
-                <NTooltip>
-                    {{
-                        trigger: () => <NButton size='tiny' onClick={() => emit('editRecord', domain, record)}>
-                            {{
-                                icon: () => <NIcon component={EditRegular} />
-                            }}
-                        </NButton>,
-                        default: () => t("common.edit")
-                    }}
-                </NTooltip>
-                <NPopconfirm onPositiveClick={() => emit('recordDelete', domain, record)}>
-                    {{
-                        trigger: () => <NButton type='error' size='tiny'>
-                            {{
-                                icon: () => <NIcon component={TrashAlt} />
-                            }}
-                        </NButton>,
-                        default: () => t("common.deleteConfirm")
-                    }}
-                </NPopconfirm>
-            </NButtonGroup>
-        </NFlex>
+        <Flex justify="end" gap='small'>
+            <Tooltip title={t("common.edit")}>
+                <Button icon={<EditFilled />} size="small" onClick={onEdit}/>
+            </Tooltip>
+
+            <Popconfirm onConfirm={onDelete} title={t("common.deleteConfirm")}>
+                <Tooltip title={t("common.delete")}>
+                    <Button danger type="primary" icon={<DeleteOutlined />} size="small" />
+                </Tooltip>
+            </Popconfirm>
+        </Flex>
     )
 }
-
-export default RecordOps

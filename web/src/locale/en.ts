@@ -86,6 +86,7 @@ export default {
             hasSpace: 'shoule have no space',
             badIPv4: 'invalid IPv4 address',
             badIPv6: 'invalid IPv6 address',
+            badEmail: 'no @ for this email address',
             badName: {
                 dotAndMinus: 'should not start or end with "." "-"',
                 doubleDots: 'should have no contianus "."',

@@ -1,8 +1,7 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
-import { type Record } from '@/stores/records';
-import { type Domain } from "@/stores/domains";
-
-import i18n from "@/locale/i18n";
+import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from "axios"
+import { type Record } from '../stores/records'
+import { type Domain } from "../stores/domains"
+import i18n from "../locale"
 
 type Result<T> = {
     success: boolean
@@ -10,45 +9,52 @@ type Result<T> = {
     data: T
 }
 
+const t = i18n.t
 // 5 second.
 const notificationDuration = 5000
 const messages = new Map<number, {
-    title: string, content: string, duration: number
+    message: string, description: string, duration: number
 }>(
     [
         [400, {
-            title: i18n.global.t("api.error400.title"),
-            content: i18n.global.t("api.error400.content"),
+            message: t("api.error400.title"),
+            description: t("api.error400.content"),
             duration: notificationDuration
         }],
         [401, {
-            title: i18n.global.t("api.error401.title"),
-            content: i18n.global.t("api.error401.content"),
+            message: t("api.error401.title"),
+            description: t("api.error401.content"),
             duration: notificationDuration
         }],
         [403, {
-            title: i18n.global.t("api.error403.title"),
-            content: i18n.global.t("api.error403.content"),
+            message: t("api.error403.title"),
+            description: t("api.error403.content"),
             duration: notificationDuration
         }],
         [404, {
-            title: i18n.global.t("api.error404.title"),
-            content: i18n.global.t("api.error404.content"),
+            message: t("api.error404.title"),
+            description: t("api.error404.content"),
             duration: notificationDuration
         }],
         [500, {
-            title: i18n.global.t("api.error500.title"),
-            content: i18n.global.t("api.error500.content"),
+            message: t("api.error500.title"),
+            description: t("api.error500.content"),
             duration: notificationDuration
         }]
     ]
 )
 
-export function getErrorInfo(err: any)  {
+export interface ResponseError {
+    response: {
+        status: number
+    }
+}
+
+export function getErrorInfo(err: ResponseError) {
     const msg = messages.get(err.response.status)
-    return msg? msg: {
-        title: i18n.global.t("api.errorUnknown.title"),
-        content: i18n.global.t("api.errorUnknown.content"),
+    return msg ? msg : {
+        message: t("api.errorUnknown.title"),
+        description: t("api.errorUnknown.content"),
         duration: notificationDuration
     }
 }

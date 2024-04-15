@@ -1,17 +1,16 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import api from '@/apis/api'
+import { useState } from 'react'
+import api from '../api'
 
-export type Domain = {
-    id: number;
-    domain_name: string;
-    main_dns: string;
-    admin_email: string;
-    serial_number: number;
-    refresh_interval: number;
-    retry_interval: number;
-    expiry_period: number;
-    negative_ttl: number;
+export class Domain {
+    id?: number
+    domain_name?: string
+    main_dns?: string
+    admin_email?: string
+    serial_number?: number
+    refresh_interval?: number
+    retry_interval?: number
+    expiry_period?: number
+    negative_ttl?: number
 }
 
 const domainDevData: Domain[] = [
@@ -39,43 +38,37 @@ const domainDevData: Domain[] = [
     },
 ]
 
-export const useDomainStore = defineStore('domains', () => {
-    const domains = ref<Domain[]>([])
-    const domainsGetter = computed(() => domains.value)
+export const useDomainStore = () => {
+    const [domains, setDomains] = useState<Domain[]>([])
 
     async function loadDomains() {
-        // TODO: load from api
-        domains.value = import.meta.env.DEV ?
-            domainDevData :
-            (await api.get<Domain[]>('/domains')).data.data
+        setDomains(import.meta.env.DEV ? domainDevData : (await api.get<Domain[]>('/domains')).data.data)
     }
 
     async function addDomain(domain: Domain) {
-        // TODO: load from api
         if (!import.meta.env.DEV) {
             domain = (await api.post("/domains", domain)).data.data
+        } else if (!domain.id) {
+            domain.id = Math.floor(1000 + Math.random() * 9000)
         }
 
-        domains.value.push(domain)
+        setDomains(domains.concat(domain))
     }
 
     async function updateDomain(domain: Domain) {
-        // TODO: load from api
         if (!import.meta.env.DEV) {
             await api.put("/domains", domain)
         }
 
-        domains.value = domains.value.map(e => (e.id === domain.id || e.domain_name === domain.domain_name) ? domain : e)
+        setDomains(domains.map((e: Domain) => (e.id === domain.id || e.domain_name === domain.domain_name) ? domain : e))
     }
 
     async function removeDomain(domain: Domain) {
-        // TODO: load from api
         if (!import.meta.env.DEV) {
             await api.delete(`/domains/${domain.id}`)
         }
-
-        domains.value = domains.value.filter(e => e.id !== domain.id)
+        setDomains(domains.filter(e => e.id !== domain.id))
     }
-    return { domains, domainsGetter, loadDomains, addDomain, updateDomain, removeDomain }
-})
 
+    return { domains, loadDomains, addDomain, updateDomain, removeDomain }
+}

@@ -1,32 +1,34 @@
-import {
-    NNotificationProvider,
-    NConfigProvider,
-    NGlobalStyle,
-    useOsTheme,
-    darkTheme,
-    lightTheme,
-} from "naive-ui";
+import { RouterProvider } from 'react-router-dom'
+import router from './router'
+import { App, ConfigProvider, Spin, theme } from 'antd'
+import zhCN from 'antd/locale/zh_CN'
+import enUS from 'antd/locale/en_US'
 
-import { zhCN, dateZhCN, enUS, dateEnUS } from 'naive-ui'
-import { RouterView } from "vue-router";
+import './App.css'
+import isBrowserDarkTheme from './isBrowserDarkTheme'
+import i18n from './locale'
 
-const osThemeRef = useOsTheme()
-const theme = osThemeRef.value === 'dark' ? darkTheme : lightTheme
-const locale = navigator.language === "zh-CN" ? zhCN : enUS
-const dateLocale = navigator.language === "zh-CN" ? dateZhCN : dateEnUS
-
-function App() {
-    document.title = 'reCoreD-UI'
-    return (
-        <NConfigProvider theme={theme} locale={locale} date-locale={dateLocale}>
-            <NGlobalStyle />
-            <NNotificationProvider max={3}>
-                <RouterView />
-            </NNotificationProvider>
-        </NConfigProvider>
-    )
+function detectLanguage() {
+  switch (i18n.language) {
+    case 'zh-CN':
+    case 'zh':
+      return zhCN
+    default:
+      return enUS
+  }
 }
 
-App.displayName = 'App'
+function ReactApp() {
+  document.title = 'reCoreD-UI'
+  const themeUsed = isBrowserDarkTheme() ? theme.darkAlgorithm : theme.defaultAlgorithm
 
-export default App
+  return (
+    <ConfigProvider theme={{ algorithm: themeUsed }} locale={detectLanguage()}>
+      <App>
+        <RouterProvider router={router} fallbackElement={<Spin size='large' />} />
+      </App>
+    </ConfigProvider>
+  )
+}
+
+export default ReactApp

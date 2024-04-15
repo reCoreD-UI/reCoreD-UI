@@ -86,6 +86,7 @@ export default {
             hasSpace: '不能有空格',
             badIPv4: '不是有效的 IPv4 地址',
             badIPv6: '不是有效的 IPv6 地址',
+            badEmail: '这里的邮箱不能有 @ 符号',
             badName: {
                 dotAndMinus: '资源记录不能以 "."、"-" 开头或结尾',
                 doubleDots: '资源记录不能有连续的 "."',

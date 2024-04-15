@@ -1,34 +1,36 @@
 {
-  "name": "recored-ui",
-  "version": "0.0.0",
+  "name": "web",
   "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "NODE_ENV=dev vite",
-    "build": "run-p type-check \"build-only {@}\" --",
-    "preview": "vite preview",
-    "build-only": "vite build",
-    "type-check": "vue-tsc --build --force"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.3.6",
+    "antd": "^5.16.1",
     "axios": "^1.6.8",
-    "pinia": "^2.1.7",
-    "vue": "^3.4.21",
-    "vue-i18n": "^9.11.0",
-    "vue-router": "^4.3.0"
+    "i18next": "^23.11.1",
+    "i18next-browser-languagedetector": "^7.2.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-i18next": "^14.1.0",
+    "react-redux": "^9.1.0",
+    "react-router-dom": "^6.22.3"
   },
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.2",
-    "@types/node": "^20.11.28",
-    "@vicons/fa": "^0.12.0",
-    "@vitejs/plugin-vue": "^5.0.4",
-    "@vitejs/plugin-vue-jsx": "^3.1.0",
-    "@vue/tsconfig": "^0.5.1",
-    "naive-ui": "^2.38.1",
-    "npm-run-all2": "^6.1.2",
-    "typescript": "~5.4.0",
-    "vfonts": "^0.0.3",
-    "vite": "^5.1.6",
-    "vue-tsc": "^2.0.6"
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@typescript-eslint/eslint-plugin": "^7.6.0",
+    "@typescript-eslint/parser": "^7.6.0",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.0"
   }
 }

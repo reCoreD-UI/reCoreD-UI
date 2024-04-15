@@ -1,250 +1,119 @@
+import { LeftOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons"
+import { App, Button, Flex, Input, Layout, Spin, Table, Typography, theme } from "antd"
+import { Params, useLoaderData, useNavigate } from "react-router-dom"
 import './RecordsView.css'
+import i18n from '../locale'
+import { useEffect, useState } from "react"
+import { type Record, RecordT, useRecordStore, RecordTypes } from "../stores/records"
+import { ResponseError, getErrorInfo } from "../api"
+import RecordOps from "../components/records/RecordOps"
+import RecordEditModal from "../components/records/RecordEditModal"
 
-import {
-    NSpin, NPageHeader,
-    NFlex, NButton, NIcon, NGrid, NGi,
-    NStatistic, NDataTable, NInput,
-    NModalProvider,
-    createDiscreteApi
-} from 'naive-ui'
-import type { DataTableColumns } from 'naive-ui'
-import { useRecordStore, type Record, type SOARecord, RecordTypes, type ARecord } from '@/stores/records'
-import { getErrorInfo } from '@/apis/api'
-import { PlusSquare, RedoAlt, CheckCircle, Clock, Cogs, Search } from '@vicons/fa'
-import router from '@/router';
-import RecordOps from '@/components/records/RecordOps'
-import RecordEditModal from '@/components/records/RecordEditModal'
-import i18n from '@/locale/i18n'
-import { ref } from 'vue'
+const { t } = i18n
+const emptyRecord: Record<RecordT> = {} as Record
 
-const { t } = i18n.global
+export default function RecordsView() {
+    const { domain } = useLoaderData() as Params<string>
+    const [loading, setLoading] = useState(true)
+    const [searchText, setSearchText] = useState<string>('')
+    const [editModalShow, setEditModalShow] = useState(false)
+    const [currentRecord, setCurrentRecord] = useState<Record>(emptyRecord)
+    const { notification } = App.useApp()
+    const {
+        token: { colorBgContainer, borderRadiusLG },
+    } = theme.useToken();
+    const go = useNavigate()
+    const recordStore = useRecordStore()
 
-type Props = {
-    domain: string
-}
+    useEffect(() => {
+        if (domain)
+            recordStore.loadRecords(domain).then(() => setLoading(false)).catch(e => {
+                const msg = getErrorInfo(e as ResponseError)
+                notification.error(msg)
+                console.error(e)
+            })
+    }, [domain])
 
-const recordStore = useRecordStore()
-const { notification } = createDiscreteApi(['notification'])
-const editModalShow = ref(false)
-const editingRecord = ref<Record>({} as Record)
-const loading = ref(true);
-const records = ref<Record[] | undefined>([] as Record[]);
-const soa = ref<SOARecord>({} as SOARecord)
-const reloadRecords = () => records.value = recordStore.records?.filter(e => e.record_type !== RecordTypes.RecordTypeSOA)
-
-async function refreshRecords(domain: string) {
-    try {
-        await recordStore.loadRecords(domain)
-        reloadRecords()
-        soa.value = recordStore.records?.find(e => e.record_type === RecordTypes.RecordTypeSOA)?.content as SOARecord
-    } catch (err) {
-        const msg = getErrorInfo(err)
-        notification.error(msg)
-        console.error(err)
-    } finally {
-        loading.value = false;
+    function closeEditModal() {
+        setCurrentRecord(emptyRecord)
+        setEditModalShow(false)
     }
-}
 
-function goBack() {
-    router.push('/domains')
-}
-
-function searchRecord(value: string) {
-    if (value.length > 0) {
-        records.value = recordStore.records?.
-            filter(e => e.record_type !== RecordTypes.RecordTypeSOA).
-            filter(e => !!~e.name.indexOf(value))
-    } else {
-        records.value = recordStore.records?.
-            filter(e => e.record_type !== RecordTypes.RecordTypeSOA)
+    function openEditModal(record: Record) {
+        setCurrentRecord(record)
+        setEditModalShow(true)
     }
-}
 
-async function deleteRecord(domain: string, record: Record) {
-    try {
-        await recordStore.removeRecord(domain, record)
-        reloadRecords()
-    } catch (err) {
-        const msg = getErrorInfo(err)
-        notification.error(msg)
-        console.error(err)
+    function newRecord() {
+        openEditModal({
+            zone: `${domain}.`,
+            name: '',
+            record_type: RecordTypes.RecordTypeA,
+            ttl: 600
+        } as Record)
     }
-}
 
-function showEditing(domain: string, record: Record) {
-    editModalShow.value = true
-    editingRecord.value = record
-}
-
-function newRecord(domain: string) {
-    showEditing(domain, {
-        zone: `${domain}.`,
-        ttl: 500,
-        record_type: RecordTypes.RecordTypeA,
-        content: {
-            ip: ''
-        } as ARecord
-    } as Record)
-}
-
-const generateColumns = (domain: string) => [
-    {
-        key: 'no',
-        title: '#',
-        render(_, index) {
-            return index + 1
-        }
-    },
-    {
-        key: 'name',
-        title: t("records.name"),
-    },
-    {
-        key: 'record_type',
-        title: t('records.recordType')
-    },
-    {
-        key: 'content',
-        title: t('records.content'),
-        render(row: Record) {
-            return Object.entries(row.content).map(i => i[1]).join(" ")
-        }
-    },
-    {
-        key: 'ttl',
-        title: 'TTL (s)'
-    },
-    {
-        key: '',
-        render(row: Record) {
-            return <RecordOps record={row} domain={domain} onRecordDelete={deleteRecord} onEditRecord={showEditing} />
-        }
-    }
-] as DataTableColumns<Record>
-
-const statRefresh = () => (
-    <NGi>
-        <NStatistic value={soa.value.refresh}>
-            {{
-                suffix: () => 's',
-                label: () => (
-                    <>
-                        <NIcon component={RedoAlt} style={{ transform: 'translateY(2px)' }} />
-                        <span>{t('records.refresh')}</span>
-                    </>
-                )
-            }}
-        </NStatistic>
-    </NGi>
-)
-
-const statRetry = () => (
-    <NGi>
-        <NStatistic value={soa.value.retry}>
-            {{
-                suffix: () => 's',
-                label: () => (
-                    <>
-                        <NIcon component={CheckCircle} style={{ transform: 'translateY(2px)' }} />
-                        <span>{t('records.retry')}</span>
-                    </>
-                )
-            }}
-        </NStatistic>
-    </NGi>
-)
-
-const statExpire = () => (
-    <NGi>
-        <NStatistic value={soa.value.expire}>
-            {{
-                suffix: () => 's',
-                label: () => (
-                    <>
-                        <NIcon component={Clock} style={{ transform: 'translateY(2px)' }} />
-                        <span>{t('records.expire')}</span>
-                    </>
-                )
-            }}
-        </NStatistic>
-    </NGi>
-)
-
-const statTTL = () => (
-    <NGi>
-        <NStatistic value={soa.value.minttl}>
-            {{
-                suffix: () => 's',
-                label: () => (
-                    <>
-                        <NIcon component={Cogs} style={{ transform: 'translateY(2px)' }} />
-                        <span>{t('records.ttl')}</span>
-                    </>
-                )
-            }}
-        </NStatistic>
-    </NGi>
-)
-
-function recordsViewBodyHeaderExtra() {
     return (
-        <NGrid cols={4} >
-            <statRefresh />
-            <statRetry />
-            <statExpire />
-            <statTTL />
-        </NGrid>
-    )
-}
-
-function recordsViewBody({ domain }: Props) {
-    const columns = generateColumns(domain)
-    return (
-        <NModalProvider>
-            <NPageHeader title={t('domains.dnsRecord')} subtitle={domain} onBack={goBack}>
-                {{
-                    extra: () => (
-                        <NFlex wrap={false} justify="end" inline>
-                            <NButton type="primary" onClick={() => newRecord(domain)}>
-                                {{
-                                    icon: () => <NIcon component={PlusSquare} />,
-                                    default: () => t('common.add')
-                                }}
-                            </NButton>
-                            <NInput placeholder={t('records.search')} onUpdate:value={searchRecord} clearable>
-                                {{
-                                    prefix: () => <NIcon component={Search} />
-                                }}
-                            </NInput>
-                        </NFlex>
-                    ),
-                    default: () => <recordsViewBodyHeaderExtra />
-                }}
-            </NPageHeader>
-            <br />
-            <NDataTable data={records.value} columns={columns} pagination={{ pageSize: 20 }} />
-        </NModalProvider>
-    )
-}
-
-function RecordsView({ domain }: Props) {
-    try {
-        refreshRecords(domain)
-    } catch (err) {
-        const msg = getErrorInfo(err)
-        notification.error(msg)
-        console.error(err)
-    }
-    return (
-        <div id='records'>
-            <RecordEditModal show={editModalShow.value} domain={domain} record={editingRecord.value} onReloadRecords={reloadRecords} onUpdate:show={(v: boolean) => editModalShow.value = v} />
+        <>
             {
-                loading.value ? <NSpin size='large' /> : <recordsViewBody domain={domain} />
+                loading ? <Spin size='large' /> :
+                    <>
+                        <Layout className="records-layout">
+                            <Layout.Header className="records-layout-header">
+                                <Flex align='center' className="toolbar">
+                                    <Flex align="center" gap='small'>
+                                        <Button onClick={() => go('/domains')} type="text" icon={<LeftOutlined />} />
+                                        <Typography.Title level={1} className="display-as-inline title">{t('domains.dnsRecord')}</Typography.Title>
+                                        <Typography.Title level={2} type='secondary' className="display-as-inline subtitle">{domain}</Typography.Title>
+                                    </Flex>
+                                    <Flex align="center" gap='small' className="right">
+                                        <Button type="primary" icon={<PlusOutlined />} onClick={newRecord}>
+                                            {t('common.add')}
+                                        </Button>
+                                        <Input prefix={<SearchOutlined />} placeholder={t('records.search')} onChange={v => setSearchText(v.target.value)} />
+                                    </Flex>
+                                </Flex>
+                            </Layout.Header>
+                            <Layout.Content style={{
+                                margin: 24,
+                                borderRadius: borderRadiusLG,
+                                minHeight: 480,
+                                background: colorBgContainer,
+                            }}>
+                                <Table<Record<RecordT>>
+                                    dataSource={recordStore.records
+                                        .filter(i => i.record_type !== RecordTypes.RecordTypeSOA)
+                                        .filter(i => i.name?.includes(searchText) || Object.entries(i.content as RecordT).map(i => i[1]).join(" ").includes(searchText))
+                                    }
+                                    pagination={{ defaultPageSize: 20 }}
+                                    rowKey={e => `${e.id}`}
+                                >
+                                    <Table.Column<Record<RecordT>> title='#' render={(_v, _r, index) => index + 1} />
+                                    <Table.Column<Record<RecordT>> title={t("records.name")} dataIndex='name' key='name' />
+                                    <Table.Column<Record<RecordT>> title={t('records.recordType')} dataIndex='record_type' key='record_type' />
+                                    <Table.Column<Record<RecordT>> title={t('records.content')} render={(v) => Object.entries(v.content).map(i => i[1]).join(" ")} />
+                                    <Table.Column<Record<RecordT>> title='TTL' key='ttl' dataIndex='ttl' />
+                                    <Table.Column<Record<RecordT>> key='op' render={(v: Record) =>
+                                        <RecordOps
+                                            onDelete={() => {
+                                                if (domain)
+                                                    recordStore.removeRecord(domain, v).catch(e => {
+                                                        const msg = getErrorInfo(e as ResponseError)
+                                                        notification.error(msg)
+                                                        console.error(e)
+                                                    })
+                                            }} onEdit={() => openEditModal(v)}
+                                        />
+                                    } />
+                                </Table>
+                            </Layout.Content>
+                        </Layout>
+                        <RecordEditModal open={editModalShow} onCancel={closeEditModal}
+                            onOk={closeEditModal} record={currentRecord}
+                            editRecord={v => recordStore.updateRecord(domain!, v)}
+                            createRecord={v => recordStore.addRecord(domain!, v)} />
+                    </>
             }
-        </div>
+        </>
     )
 }
-
-RecordsView.displayName = 'RecordsView'
-export default RecordsView
