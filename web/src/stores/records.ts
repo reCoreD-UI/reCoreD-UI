@@ -35,6 +35,7 @@ export class TXTRecord {
 
     static validate(v: TXTRecord): true | Error {
         if (!v.text || v.text === '') return new Error(t('common.mandatory'))
+        if (v.text.length > 512) return new Error('records.errors.tooLong')
         return true
     }
 

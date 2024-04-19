@@ -25,7 +25,7 @@ type recordContentTypes interface {
 }
 
 type Record[T recordContentTypes] struct {
-	ID         int    `gorm:"primaryKey" json:"id"`
+	ID         uint   `gorm:"primaryKey" json:"id"`
 	Zone       string `gorm:"not null;size:255" json:"zone"`
 	Name       string `gorm:"not null;size:255" json:"name"`
 	Ttl        int    `json:"ttl"`
@@ -34,11 +34,11 @@ type Record[T recordContentTypes] struct {
 }
 
 func (*Record[T]) TableName() string {
-	return "coredns_record"
+	return "coredns_records"
 }
 
 func (r *Record[T]) CheckZone() error {
-	if strings.HasSuffix(r.Zone, ".") {
+	if !strings.HasSuffix(r.Zone, ".") {
 		return ErrorZoneNotEndWithDot
 	}
 	return nil
@@ -65,6 +65,10 @@ func (r *Record[T]) GetType() string {
 	return r.RecordType
 }
 
+func (r *Record[T]) GetValue() IRecord {
+	return r.ToEntity()
+}
+
 type IRecord interface {
 	TableName() string
 	CheckZone() error
@@ -72,4 +76,5 @@ type IRecord interface {
 	ToEntity() IRecord
 	FromEntity(any) error
 	GetType() string
+	GetValue() IRecord
 }

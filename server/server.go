@@ -22,6 +22,9 @@ func NewServer(c *cli.Context) (*Server, error) {
 	}
 	if c.Bool("debug") {
 		database.Client = database.Client.Debug()
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
 	}
 
 	return &Server{

@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"path"
 	"reCoreD-UI/controllers"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -24,11 +23,21 @@ func (s *Server) setupRoute() {
 	if err != nil {
 		logrus.Fatal(err)
 	}
+	logrus.Debugf("got %s:%s", username, password)
 
-	swaggerHandler := gin.New()
-	swaggerHandler.GET(path.Join(swaggerPrefix, "*any"), ginSwagger.WrapHandler(swaggerfiles.Handler))
+	server := s.webServer.Group(s.prefix)
 
-	metricHandler := gin.New()
+	swaggerHandler := server
+	if s.debug {
+		swaggerHandler.GET(path.Join(swaggerPrefix, "*any"), ginSwagger.WrapHandler(swaggerfiles.Handler))
+	} else {
+		swaggerHandler.GET(path.Join(swaggerPrefix, "*any"), func(ctx *gin.Context) {
+			ctx.HTML(http.StatusNotFound, "", nil)
+		})
+	}
+
+	controllers.RegisterMetrics()
+	metricHandler := server
 	metricHandler.GET(metricPrefix, func(ctx *gin.Context) {
 		if err := controllers.RefreshMetrics(); err != nil {
 			logrus.Error(err)
@@ -36,11 +45,18 @@ func (s *Server) setupRoute() {
 		promhttp.Handler().ServeHTTP(ctx.Writer, ctx.Request)
 	})
 
-	apiHandler := gin.New()
+	apiHandler := server
 
 	groupV1 := apiHandler.Group(apiPrefix, gin.BasicAuth(gin.Accounts{
 		username: password,
-	})).Group("/v1")
+	}), func(ctx *gin.Context) {
+		_, ok := ctx.Get(gin.AuthUserKey)
+		if !ok {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, Response{
+				Succeed: false,
+			})
+		}
+	}).Group("/v1")
 
 	domains := groupV1.Group("/domains")
 	domains.
@@ -57,15 +73,15 @@ func (s *Server) setupRoute() {
 		PUT("/:domain", updateRecord).
 		DELETE("/:domain/:id", deleteRecord)
 
-	server := s.webServer.Group(s.prefix)
-	server.Use(func(ctx *gin.Context) {
+	/*server := s.webServer.Group(s.prefix)
+	server.Use(apiHandler.HandleContext, metricHandler.HandleContext, func(ctx *gin.Context) {
 		uri := ctx.Request.RequestURI
 		logrus.Debug(uri)
 		switch {
 		case strings.HasPrefix(uri, path.Join(s.prefix, apiPrefix)):
-			apiHandler.HandleContext(ctx)
+			//apiHandler.HandleContext(ctx)
 		case strings.HasPrefix(uri, path.Join(s.prefix, metricPrefix)):
-			metricHandler.HandleContext(ctx)
+			//metricHandler.HandleContext(ctx)
 		case strings.HasPrefix(uri, path.Join(s.prefix, swaggerPrefix)):
 			if s.debug {
 				swaggerHandler.HandleContext(ctx)
@@ -75,5 +91,8 @@ func (s *Server) setupRoute() {
 		default:
 			staticFileHandler()(ctx)
 		}
-	})
+	})*/
+
+	server.GET("/", staticFileHandler())
+	server.GET("/assets/*any", staticFileHandler())
 }

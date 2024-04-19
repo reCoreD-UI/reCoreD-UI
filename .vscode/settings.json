@@ -1,0 +1,17 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "mysql.dev",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "recored-ui",
+            "database": "recoredui",
+            "username": "recoredui"
+        }
+    ]
+}

@@ -6,17 +6,17 @@ import (
 )
 
 type Domain struct {
-	ID         int    `gorm:"primaryKey" json:"id"`
+	ID         uint   `gorm:"primaryKey" json:"id"`
 	DomainName string `gorm:"unique,not null,size:255" json:"domain_name"`
 
 	//SOA Info
 	MainDNS         string `gorm:"not null;size:255" json:"main_dns"`
 	AdminEmail      string `gorm:"not null;size:255" json:"admin_email"`
 	SerialNumber    int64  `gorm:"not null;default:1" json:"serial_number"`
-	RefreshInterval uint32 `gorm:"not null;size:255,default:\"86400\"" json:"refresh_interval"`
-	RetryInterval   uint32 `gorm:"not null;size:255,default:\"7200\"" json:"retry_interval"`
-	ExpiryPeriod    uint32 `gorm:"not null;size:255,default:\"3600000\"" json:"expiry_period"`
-	NegativeTtl     uint32 `gorm:"not null;size:255,default:\"86400\"" json:"negative_ttl"`
+	RefreshInterval uint32 `gorm:"type:uint;not null;default:86400" json:"refresh_interval"`
+	RetryInterval   uint32 `gorm:"type:uint;not null;default:7200" json:"retry_interval"`
+	ExpiryPeriod    uint32 `gorm:"type:uint;not null;default:3600000" json:"expiry_period"`
+	NegativeTtl     uint32 `gorm:"type:uint;not null;default:86400" json:"negative_ttl"`
 }
 
 func (d *Domain) EmailSOAForamt() string {
@@ -53,8 +53,13 @@ func (d *Domain) GenerateSOA() SOARecord {
 	return r
 }
 
+func (d *Domain) GetValue() Domain {
+	return *d
+}
+
 type IDomain interface {
 	EmailSOAForamt() string
 	WithDotEnd() string
 	GenerateSOA() SOARecord
+	GetValue() Domain
 }

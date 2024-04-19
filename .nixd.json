@@ -1,0 +1,13 @@
+{
+    "formatting": {
+        "command": "nixpkgs-fmt"
+    },
+    "eval": {
+        "target": {
+            "args": [
+                "--expr",
+                "with import <nixpkgs> { };"
+            ]
+        }
+    }
+}

@@ -3,6 +3,7 @@ package database
 import (
 	"errors"
 
+	"github.com/huandu/go-clone"
 	"gorm.io/gorm"
 )
 
@@ -14,41 +15,40 @@ func (b BaseDAO[T]) Migrate(db *gorm.DB, e T) error {
 
 func (BaseDAO[T]) GetAll(db *gorm.DB, e T, cond ...T) ([]T, error) {
 	var r []T
-	tx := db
+	tx := db.Model(e)
 	for _, c := range cond {
 		tx = tx.Where(c)
 	}
 
-	if err := tx.Find(&r, e).Error; err != nil {
+	rows, err := tx.Rows()
+	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err := db.ScanRows(rows, e); err != nil {
+			return nil, err
+		}
+
+		i := clone.Clone(e).(T)
+
+		r = append(r, i)
+	}
+
 	return r, nil
 }
 
 func (BaseDAO[T]) GetOne(db *gorm.DB, e T, cond ...T) (T, error) {
-	var r T
 	tx := db
 	for _, c := range cond {
 		tx = tx.Where(c)
 	}
 
-	if err := tx.First(&r, e).Error; err != nil {
-		return r, err
+	if err := tx.First(e).Error; err != nil {
+		return e, err
 	}
-	return r, nil
-}
-
-func (BaseDAO[T]) GetSome(db *gorm.DB, e T, limit, offset int, cond ...T) ([]T, error) {
-	var r []T
-	tx := db
-	for _, c := range cond {
-		tx = tx.Where(c)
-	}
-
-	if err := tx.Find(&r, e).Limit(limit).Offset(offset).Error; err != nil {
-		return nil, err
-	}
-	return r, nil
+	return e, nil
 }
 
 func (BaseDAO[T]) Create(db *gorm.DB, e T) (T, error) {

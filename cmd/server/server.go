@@ -18,12 +18,12 @@ var Command = &cli.Command{
 		}),
 		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:  "listen",
-			Value: "[::]",
+			Value: "::",
 			Usage: "IP for listen at",
 		}),
 		altsrc.NewIntFlag(&cli.IntFlag{
 			Name:  "port",
-			Value: 8080,
+			Value: 3000,
 			Usage: "Port for listen at",
 		}),
 	},

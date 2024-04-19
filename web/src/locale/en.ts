@@ -91,7 +91,8 @@ export default {
                 dotAndMinus: 'should not start or end with "." "-"',
                 doubleDots: 'should have no contianus "."',
                 logerThan63: 'should not longer than 63 characters splited by "."'
-            }
+            },
+            tooLong: 'too long'
         }
     }
 }

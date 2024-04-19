@@ -42,7 +42,7 @@ func CreateRecords(rs []models.IRecord) error {
 			return err
 		}
 	}
-	
+
 	return tx.Commit().Error
 }
 
@@ -68,7 +68,7 @@ func DeleteRecord(domain, id string) error {
 	}
 
 	tx := database.Client.Begin()
-	record, err := (recordsDAO{}).GetOne(tx, &models.Record[models.RecordContentDefault]{ID: ID, Zone: fmt.Sprintf("%s.", domain)})
+	record, err := (recordsDAO{}).GetOne(tx, &models.Record[models.RecordContentDefault]{ID: uint(ID), Zone: fmt.Sprintf("%s.", domain)})
 	if err != nil {
 		tx.Rollback()
 		return err

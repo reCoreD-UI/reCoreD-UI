@@ -91,7 +91,8 @@ export default {
                 dotAndMinus: '资源记录不能以 "."、"-" 开头或结尾',
                 doubleDots: '资源记录不能有连续的 "."',
                 logerThan63: '资源记录以 "." 分割的每个字符串长度不能超过63字符'
-            }
+            },
+            tooLong: '记录值过长'
         }
     }
 }

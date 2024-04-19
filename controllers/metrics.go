@@ -37,7 +37,7 @@ func RegisterMetrics() {
 
 	GinMetrics := ginprometheus.NewPrometheus("recoredui")
 	for _, v := range GinMetrics.MetricsList {
-		prometheus.MustRegister(v.MetricCollector)
+		prometheus.Register(v.MetricCollector)
 	}
 }
 

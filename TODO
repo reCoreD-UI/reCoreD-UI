@@ -2,6 +2,7 @@
 - [x] Web UI
   - [x] i18n
   - [x] modals
+- [] debug
 - [] swagger
 - [] Nix Module
 - [] RBAC

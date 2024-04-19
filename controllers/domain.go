@@ -5,6 +5,8 @@ import (
 	"reCoreD-UI/database"
 	"reCoreD-UI/models"
 	"strconv"
+
+	"github.com/sirupsen/logrus"
 )
 
 type domainsDAO struct {
@@ -28,6 +30,7 @@ func CreateDomain(d *models.Domain) (*models.Domain, error) {
 	r.Name = "@"
 	r.RecordType = models.RecordTypeSOA
 	r.Content = d.GenerateSOA()
+	logrus.Debug(r)
 	if err := r.CheckZone(); err != nil {
 		tx.Rollback()
 		return nil, err
@@ -41,7 +44,7 @@ func CreateDomain(d *models.Domain) (*models.Domain, error) {
 	for i, ns := range nss {
 		record := &models.Record[models.NSRecord]{
 			Zone:       d.WithDotEnd(),
-			RecordType: models.RecordTypeSOA,
+			RecordType: models.RecordTypeNS,
 			Name:       fmt.Sprintf("ns%d", i+1),
 		}
 		record.Content.Host = ns
@@ -123,13 +126,13 @@ func DeleteDomain(id string) error {
 	}
 
 	tx := database.Client.Begin()
-	domain, err := (domainsDAO{}).GetOne(tx, &models.Domain{ID: ID})
+	domain, err := (domainsDAO{}).GetOne(tx, &models.Domain{ID: uint(ID)})
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	if err := (domainsDAO{}).Delete(tx, &models.Domain{ID: ID}); err != nil {
+	if err := (domainsDAO{}).Delete(tx, &models.Domain{ID: uint(ID)}); err != nil {
 		tx.Rollback()
 		return err
 	}
