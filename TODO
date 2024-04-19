@@ -1,2 +1,12 @@
+- [x] metrics
+- [x] Web UI
+  - [x] i18n
+  - [x] modals
+- [x] debug
+- [x] swagger
+- [x] comments
 - [] Nix Module
+
+v2.0
 - [] RBAC
+- [] Audit
