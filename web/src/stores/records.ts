@@ -184,15 +184,22 @@ export class Record<T = RecordT> {
 
     static validateName(name: string): true | Error {
         if (name === '') return new Error(t('common.mandatory'))
+
+        // RR should not contain space, and should not start or end with '-' or '.'
         if (name.includes(' ')) return new Error(t('records.errors.hasSpace'))
         if (name.startsWith('.') || name.endsWith('.')) return new Error(t('records.errors.badName.dotAndMinus'))
         if (name.startsWith('-') || name.endsWith('.')) return new Error(t('records.errors.badName.dotAndMinus'))
+        
+        // RR should not have continuous dots
         if (name.includes('..')) new Error(t('records.errors.badName.doubleDots'))
+        
+        // RR should not longer than 63 characters for every section seprated by '.'
         if (name.split('.').filter(e => e.length > 63).length > 0) return new Error(t('records.errors.badName.longerThan63'))
         return true
     }
 }
 
+// example data for development
 const recordDevData = new Map<string, Record[]>([
     ['example.com', [
         {

@@ -110,8 +110,8 @@ export default function RecordsView() {
                         </Layout>
                         <RecordEditModal open={editModalShow} onCancel={closeEditModal}
                             onOk={closeEditModal} record={currentRecord}
-                            editRecord={v => recordStore.updateRecord(domain!, v)}
-                            createRecord={v => recordStore.addRecord(domain!, v)} />
+                            editRecord={record => recordStore.updateRecord(domain!, record)}
+                            createRecord={record => recordStore.addRecord(domain!, record)} />
                     </>
             }
         </>

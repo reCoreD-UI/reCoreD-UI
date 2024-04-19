@@ -68,12 +68,12 @@ export default function DomainsView() {
                     <>
                         <Space direction="vertical" >
                             {
-                                domainStore.domains.map(e => (
-                                    <DomainCard domain={e}
-                                        onDeleteClick={() => openDeleteModal(e)}
-                                        onRecordClick={() => go(`/records/${e.domain_name}`)}
-                                        onEditClick={() => openEditModal(e)}
-                                        key={e.id}
+                                domainStore.domains.map(domain => (
+                                    <DomainCard domain={domain}
+                                        onDeleteClick={() => openDeleteModal(domain)}
+                                        onRecordClick={() => go(`/records/${domain.domain_name}`)}
+                                        onEditClick={() => openEditModal(domain)}
+                                        key={domain.id}
                                     />
                                 ))
                             }

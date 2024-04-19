@@ -13,6 +13,7 @@ export class Domain {
     negative_ttl?: number
 }
 
+// example data for development
 const domainDevData: Domain[] = [
     {
         id: 1,
