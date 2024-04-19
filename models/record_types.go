@@ -59,7 +59,7 @@ type CNAMERecord struct {
 }
 
 func (r CNAMERecord) Validate() error {
-	if strings.HasSuffix(r.Host, ".") {
+	if !strings.HasSuffix(r.Host, ".") {
 		return ErrNoDotSuffix
 	}
 	return nil
@@ -70,7 +70,7 @@ type NSRecord struct {
 }
 
 func (r NSRecord) Validate() error {
-	if strings.HasSuffix(r.Host, ".") {
+	if !strings.HasSuffix(r.Host, ".") {
 		return ErrNoDotSuffix
 	}
 	return nil
@@ -81,7 +81,7 @@ type MXRecord struct {
 }
 
 func (r MXRecord) Validate() error {
-	if strings.HasSuffix(r.Host, ".") {
+	if !strings.HasSuffix(r.Host, ".") {
 		return ErrNoDotSuffix
 	}
 	return nil
@@ -92,7 +92,7 @@ type SRVRecord struct {
 }
 
 func (r SRVRecord) Validate() error {
-	if strings.HasPrefix(r.Target, ".") {
+	if !strings.HasPrefix(r.Target, ".") {
 		return ErrNoDotSuffix
 	}
 
@@ -104,11 +104,7 @@ type SOARecord struct {
 }
 
 func (r SOARecord) Validate() error {
-	if strings.HasPrefix(r.MBox, ".") {
-		return ErrNoDotSuffix
-	}
-
-	if strings.HasSuffix(r.Ns, ".") {
+	if !strings.HasSuffix(r.Ns, ".") {
 		return ErrNoDotSuffix
 	}
 

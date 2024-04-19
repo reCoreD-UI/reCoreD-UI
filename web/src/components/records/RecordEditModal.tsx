@@ -227,6 +227,7 @@ export default function RecordEditModal({ open, record, onOk, onCancel, editReco
                 validateTrigger='onBlur'
             >
                 <Form.Item<Record> hidden name='id' />
+                <Form.Item<Record> hidden name='zone' />
                 <Form.Item<Record> label={t('records.recordType')} required name='record_type'>
                     <Select allowClear={false} options={recordTypeOptions} />
                 </Form.Item>

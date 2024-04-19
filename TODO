@@ -2,7 +2,7 @@
 - [x] Web UI
   - [x] i18n
   - [x] modals
-- [] debug
+- [x] debug
 - [x] swagger
 - [] comments
 - [] Nix Module

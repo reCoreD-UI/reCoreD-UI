@@ -234,7 +234,7 @@ func updateRecord(c *gin.Context) {
 	}
 
 	domain := c.Param("domain")
-	if domain != record.Zone {
+	if domain != record.WithOutDotTail() {
 		c.JSON(http.StatusBadRequest, Response{
 			Succeed: false,
 			Message: "request body doesn't match URI",

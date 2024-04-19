@@ -138,7 +138,7 @@ func DeleteDomain(id string) error {
 		return err
 	}
 
-	if err := (recordsDAO{}).Delete(tx, &models.Record[models.RecordContentDefault]{Zone: domain.WithDotEnd()}); err != nil {
+	if err := (recordsDAO{}).Delete(tx, &models.Record[models.RecordContentDefault]{}, &models.Record[models.RecordContentDefault]{Zone: domain.WithDotEnd()}); err != nil {
 		tx.Rollback()
 		return err
 	}

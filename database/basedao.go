@@ -90,8 +90,13 @@ func (b BaseDAO[T]) UpdateOrCreate(db *gorm.DB, e T, cond ...T) (T, error) {
 	return e, err
 }
 
-func (BaseDAO[T]) Delete(db *gorm.DB, e T) error {
-	if err := db.Delete(e).Error; err != nil {
+func (BaseDAO[T]) Delete(db *gorm.DB, e T, cond ...T) error {
+	tx := db
+	for _, c := range cond {
+		tx = tx.Where(c)
+	}
+
+	if err := tx.Delete(e).Error; err != nil {
 		return err
 	}
 	return nil
