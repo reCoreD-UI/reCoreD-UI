@@ -15,7 +15,7 @@ export default function DomainInfo({ domain }: Props) {
             </p>
             <p>
                 <GlobalOutlined className="icon-info" />
-                <span className="info">{domain.domain_name}</span>
+                <span className="info">{domain.main_dns}</span>
             </p>
         </>
     )

@@ -79,6 +79,7 @@ export default function DomainEditModal({ open, domain, editDomain, createDomain
                 scrollToFirstError
                 autoComplete="off"
             >
+                <Form.Item<Domain> hidden name='id' />
                 <Form.Item<Domain>
                     label={t('domains._')}
                     name='domain_name'

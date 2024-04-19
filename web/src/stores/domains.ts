@@ -56,6 +56,7 @@ export const useDomainStore = () => {
     }
 
     async function updateDomain(domain: Domain) {
+        console.log(domain)
         if (!import.meta.env.DEV) {
             await api.put("/domains", domain)
         }

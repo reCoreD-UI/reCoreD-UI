@@ -86,6 +86,7 @@ func GetDomains(domain string) ([]models.Domain, error) {
 
 func UpdateDomain(d *models.Domain) error {
 	tx := database.Client.Begin()
+	logrus.Debug(d)
 	if _, err := (domainsDAO{}).Update(tx, d); err != nil {
 		tx.Rollback()
 		return err
