@@ -3,7 +3,7 @@ package database
 import (
 	"errors"
 
-	"github.com/huandu/go-clone"
+	clone "github.com/huandu/go-clone/generic"
 	"gorm.io/gorm"
 )
 
@@ -31,7 +31,7 @@ func (BaseDAO[T]) GetAll(db *gorm.DB, e T, cond ...T) ([]T, error) {
 			return nil, err
 		}
 
-		i := clone.Clone(e).(T)
+		i := clone.Clone(e)
 
 		r = append(r, i)
 	}

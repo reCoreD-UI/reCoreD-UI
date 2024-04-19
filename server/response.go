@@ -10,10 +10,16 @@ import (
 	"gorm.io/gorm"
 )
 
+// Response common http response
 type Response struct {
-	Succeed bool        `json:"succeed"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
+	// `true` for 2xx, else `false`
+	Succeed bool `json:"succeed"`
+
+	// error message
+	Message string `json:"message"`
+
+	// payload here
+	Data interface{} `json:"data"`
 }
 
 func errorHandler(c *gin.Context, err error) {

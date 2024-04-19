@@ -24,11 +24,13 @@ type recordContentTypes interface {
 	ARecord | AAAARecord | CNAMERecord | CAARecord | NSRecord | MXRecord | SOARecord | SRVRecord | TXTRecord | RecordContentDefault
 }
 
+// Record dns records for coredns mysql plugin
 type Record[T recordContentTypes] struct {
-	ID         uint   `gorm:"primaryKey" json:"id"`
-	Zone       string `gorm:"not null;size:255" json:"zone"`
-	Name       string `gorm:"not null;size:255" json:"name"`
-	Ttl        int    `json:"ttl"`
+	ID   uint   `gorm:"primaryKey" json:"id"`
+	Zone string `gorm:"not null;size:255" json:"zone"`
+	Name string `gorm:"not null;size:255" json:"name"`
+	Ttl  int    `json:"ttl"`
+	// see https://github.com/cloud66-oss/coredns_mysql/blob/main/types.go for content
 	Content    T      `gorm:"serializer:json;type:text" json:"content"`
 	RecordType string `gorm:"not null;size:255" json:"record_type"`
 }

@@ -1,4 +1,573 @@
+basePath: /api/v1
+definitions:
+  models.Domain:
+    properties:
+      admin_email:
+        type: string
+      domain_name:
+        type: string
+      expiry_period:
+        type: integer
+      id:
+        type: integer
+      main_dns:
+        type: string
+      negative_ttl:
+        type: integer
+      refresh_interval:
+        type: integer
+      retry_interval:
+        type: integer
+      serial_number:
+        type: integer
+    type: object
+  models.Record-models_RecordContentDefault:
+    properties:
+      content:
+        allOf:
+        - $ref: '#/definitions/models.RecordContentDefault'
+        description: see https://github.com/cloud66-oss/coredns_mysql/blob/main/types.go
+          for content
+      id:
+        type: integer
+      name:
+        type: string
+      record_type:
+        type: string
+      ttl:
+        type: integer
+      zone:
+        type: string
+    type: object
+  models.RecordContentDefault:
+    additionalProperties: {}
+    type: object
+  server.Response:
+    properties:
+      data:
+        description: payload here
+      message:
+        description: error message
+        type: string
+      succeed:
+        description: '`true` for 2xx, else `false`'
+        type: boolean
+    type: object
 info:
   contact: {}
-paths: {}
+  description: APIs for reCoreD-UI
+  title: reCoreD-UI API
+  version: "1.0"
+paths:
+  /domains/:
+    get:
+      consumes:
+      - application/json
+      description: List all domains
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Domain'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: List all domains
+      tags:
+      - domains
+    post:
+      description: Create a domain
+      parameters:
+      - description: content
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.Domain'
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Domain'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Create a domain
+      tags:
+      - domains
+    put:
+      consumes:
+      - application/json
+      description: Update a domain
+      parameters:
+      - description: content
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.Domain'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Domain'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Update a domain
+      tags:
+      - domains
+  /domains/{id}:
+    delete:
+      description: Delete a domain
+      parameters:
+      - description: Domain ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Delete a domain
+      tags:
+      - domains
+  /records/{domain}:
+    get:
+      description: List all records of a domain
+      parameters:
+      - description: domain
+        in: path
+        name: domain
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Record-models_RecordContentDefault'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: List all records of a domain
+      tags:
+      - records
+    post:
+      consumes:
+      - application/json
+      description: Create a record of a domain
+      parameters:
+      - description: domain
+        in: path
+        name: domain
+        required: true
+        type: string
+      - description: content
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.Record-models_RecordContentDefault'
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Record-models_RecordContentDefault'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Create a record of a domain
+      tags:
+      - records
+    put:
+      consumes:
+      - application/json
+      description: Update a record of a domain
+      parameters:
+      - description: domain
+        in: path
+        name: domain
+        required: true
+        type: string
+      - description: content
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.Record-models_RecordContentDefault'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Record-models_RecordContentDefault'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Update a record of a domain
+      tags:
+      - records
+  /records/{domain}/{id}:
+    delete:
+      description: Delete a record of a domain, except SOA record.
+      parameters:
+      - description: domain
+        in: path
+        name: domain
+        required: true
+        type: string
+      - description: Record ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Delete a record of a domain
+      tags:
+      - records
+  /records/{domain}/bulk:
+    post:
+      consumes:
+      - application/json
+      description: Create some records of a domain
+      parameters:
+      - description: domain
+        in: path
+        name: domain
+        required: true
+        type: string
+      - description: content
+        in: body
+        name: object
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.Record-models_RecordContentDefault'
+          type: array
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Record-models_RecordContentDefault'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/server.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Create some records of a domain
+      tags:
+      - records
+securityDefinitions:
+  BasicAuth:
+    type: basic
 swagger: "2.0"

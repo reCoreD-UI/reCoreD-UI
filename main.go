@@ -15,6 +15,11 @@ func init() {
 	logrus.SetReportCaller(true)
 }
 
+//	@title						reCoreD-UI API
+//	@version					1.0
+//	@description				APIs for reCoreD-UI
+//	@BasePath					/api/v1
+//	@securityDefinitions.basic	BasicAuth
 func main() {
 	flags := []cli.Flag{
 		&cli.StringFlag{

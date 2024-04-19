@@ -74,6 +74,7 @@ require (
 require (
 	github.com/cloud66-oss/coredns_mysql v0.0.0-20231116193749-de52e2924a6f
 	github.com/gin-gonic/gin v1.9.1
+	github.com/huandu/go-clone/generic v1.7.2
 	github.com/sirupsen/logrus v1.9.3
 	github.com/swaggo/files v1.0.1
 	github.com/urfave/cli/v2 v2.27.1

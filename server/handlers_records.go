@@ -10,7 +10,6 @@ import (
 )
 
 func validateRecord(r models.IRecord) error {
-
 	switch r.GetType() {
 	case models.RecordTypeA:
 		record := &models.Record[models.ARecord]{}
@@ -71,6 +70,18 @@ func validateRecord(r models.IRecord) error {
 	}
 }
 
+// GetRecords godoc
+//
+//	@Router			/records/{domain} [get]
+//	@Summary		List all records of a domain
+//	@Description	List all records of a domain
+//	@Tags			records
+//	@Product		json
+//	@Param			domain	path	string	true	"domain"
+//	@Success		200	{object}	Response{data=[]models.Record[models.RecordContentDefault]}
+//	@Failure		401	{object}	Response{data=nil}
+//	@Failure		404	{object}	Response{data=nil}
+//	@Failure		500	{object}	Response{data=nil}
 func getRecords(c *gin.Context) {
 	query := &models.Record[models.RecordContentDefault]{Content: make(models.RecordContentDefault)}
 	if err := c.BindQuery(query); err != nil {
@@ -95,6 +106,21 @@ func getRecords(c *gin.Context) {
 	})
 }
 
+// CreateRecord godoc
+//
+//	@Router			/records/{domain} [post]
+//	@Summary		Create a record of a domain
+//	@Description	Create a record of a domain
+//	@Tags			records
+//	@Accept			json
+//	@Product		json
+//	@Param			domain	path	string	true	"domain"
+//	@Param			object	body	models.Record[models.RecordContentDefault]	true	"content"
+//	@Success		201	{object}	Response{data=models.Record[models.RecordContentDefault]}
+//	@Failure		400	{object}	Response{data=nil}
+//	@Failure		401	{object}	Response{data=nil}
+//	@Failure		404	{object}	Response{data=nil}
+//	@Failure		500	{object}	Response{data=nil}
 func createRecord(c *gin.Context) {
 	record := &models.Record[models.RecordContentDefault]{Content: make(models.RecordContentDefault)}
 	if err := c.BindJSON(record); err != nil {
@@ -134,6 +160,21 @@ func createRecord(c *gin.Context) {
 	})
 }
 
+// CreateRecords godoc
+//
+//	@Router			/records/{domain}/bulk [post]
+//	@Summary		Create some records of a domain
+//	@Description	Create some records of a domain
+//	@Tags			records
+//	@Accept			json
+//	@Product		json
+//	@Param			domain	path	string	true	"domain"
+//	@Param			object	body	[]models.Record[models.RecordContentDefault]	true	"content"
+//	@Success		201	{object}	Response{data=models.Record[models.RecordContentDefault]}
+//	@Failure		400	{object}	Response{data=nil}
+//	@Failure		401	{object}	Response{data=nil}
+//	@Failure		404	{object}	Response{data=nil}
+//	@Failure		500	{object}	Response{data=nil}
 func createRecords(c *gin.Context) {
 	var records []models.Record[models.RecordContentDefault]
 	if err := c.BindJSON(&records); err != nil {
@@ -159,6 +200,21 @@ func createRecords(c *gin.Context) {
 	})
 }
 
+// UpdateRecord godoc
+//
+//	@Router			/records/{domain} [put]
+//	@Summary		Update a record of a domain
+//	@Description	Update a record of a domain
+//	@Tags			records
+//	@Accept			json
+//	@Product		json
+//	@Param			domain	path	string	true	"domain"
+//	@Param			object	body	models.Record[models.RecordContentDefault]	true	"content"
+//	@Success		200	{object}	Response{data=models.Record[models.RecordContentDefault]}
+//	@Failure		400	{object}	Response{data=nil}
+//	@Failure		401	{object}	Response{data=nil}
+//	@Failure		404	{object}	Response{data=nil}
+//	@Failure		500	{object}	Response{data=nil}
 func updateRecord(c *gin.Context) {
 	record := &models.Record[models.RecordContentDefault]{Content: make(models.RecordContentDefault)}
 	if err := c.BindJSON(record); err != nil {
@@ -196,6 +252,20 @@ func updateRecord(c *gin.Context) {
 	})
 }
 
+// DeleteRecord godoc
+//
+//	@Router			/records/{domain}/{id} [delete]
+//	@Summary		Delete a record of a domain
+//	@Description	Delete a record of a domain, except SOA record.
+//	@Tags			records
+//	@Product		json
+//	@Param			domain	path	string	true	"domain"
+//	@Param			id	path	int	true	"Record ID"
+//	@Success		204	{object}	Response{data=nil}
+//	@Failure		400	{object}	Response{data=nil}
+//	@Failure		401	{object}	Response{data=nil}
+//	@Failure		404	{object}	Response{data=nil}
+//	@Failure		500	{object}	Response{data=nil}
 func deleteRecord(c *gin.Context) {
 	domain := c.Param("domain")
 	id := c.Param("id")

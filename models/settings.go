@@ -10,6 +10,7 @@ const (
 	SettingsKeyDNSServer     = "dns.servers"
 )
 
+// Settings settings for this app
 type Settings struct {
 	ID    uint   `gorm:"primaryKey"`
 	Key   string `gorm:"unique;not null;size:255"`

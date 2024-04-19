@@ -3,7 +3,10 @@
   - [x] i18n
   - [x] modals
 - [] debug
-- [] swagger
+- [x] swagger
+- [] comments
 - [] Nix Module
+
+v2.0
 - [] RBAC
 - [] Audit

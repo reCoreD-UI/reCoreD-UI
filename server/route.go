@@ -18,6 +18,7 @@ const (
 	swaggerPrefix = "/swagger"
 )
 
+
 func (s *Server) setupRoute() {
 	username, password, err := controllers.GetAdmin()
 	if err != nil {
