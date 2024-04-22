@@ -1,3 +1,23 @@
+/* 
+reCoreD-UI provides web ui for CoreDNS
+
+NAME:
+reCoreD-UI - Web UI for CoreDNS
+
+USAGE:
+   reCoreD-UI [global options] command [command options] 
+
+COMMANDS:
+   server   run server
+   config   config some settings
+   help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --config value, -c value  config yaml file [$RECORED_CONFIG_FILE]
+   --mysql-dsn value         mysql dsn [$RECORED_MYSQL_DSN]
+   --debug                   enable debug mode (default: false)
+   --help, -h                show help
+*/
 package main
 
 import (

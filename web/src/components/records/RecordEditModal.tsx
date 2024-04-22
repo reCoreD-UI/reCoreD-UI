@@ -18,6 +18,7 @@ type Props = {
     createRecord(record: Record): Promise<void>
 }
 
+// convert enum RecordTypes to a list for select options.
 const recordTypeOptions = Object.entries(RecordTypes).filter(e => e[1] !== RecordTypes.RecordTypeSOA).map(e => {
     return {
         value: e[1],
@@ -246,6 +247,8 @@ export default function RecordEditModal({ open, record, onOk, onCancel, editReco
                 </Form.Item>
                 <Form.Item<Record> noStyle shouldUpdate={(p, c) => p.record_type !== c.record_type}>
                     {
+                        // load form for record type from the map 'controls'.
+                        // this is a dynamic form
                         ({ getFieldValue }: FormInstance<Record>) => {
                             const e = controls.get(getFieldValue('record_type'))
                             if (!e) {
