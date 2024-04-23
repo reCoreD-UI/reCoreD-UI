@@ -34,6 +34,7 @@ jobs:
       run: |
         mkdir -p recored-ui-${GOOS}-${GOARCH}
         go build -trimpath -ldflags "-w -s" -v -o ./recored-ui-${GOOS}-${GOARCH} ./...
+        cp README.md LICENSE recored-ui-${GOOS}-${GOARCH}
         tar czvf recored-ui-${GOOS}-${GOARCH}.tgz recored-ui-${GOOS}-${GOARCH}
       
     - name: Build-linux-arm64
@@ -43,6 +44,7 @@ jobs:
       run: |
         mkdir -p recored-ui-${GOOS}-${GOARCH}
         go build -trimpath -ldflags "-w -s" -v -o ./recored-ui-${GOOS}-${GOARCH} ./...
+        cp README.md LICENSE recored-ui-${GOOS}-${GOARCH}
         tar czvf recored-ui-${GOOS}-${GOARCH}.tgz recored-ui-${GOOS}-${GOARCH}
       
     - name: Create Release
