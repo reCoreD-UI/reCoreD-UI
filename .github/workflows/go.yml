@@ -43,7 +43,7 @@ jobs:
         GOARCH: arm64
       run: |
         mkdir -p recored-ui-${GOOS}-${GOARCH}
-        go build -trimpath -ldflags "-w -s" -v -o ./recored-ui-${GOOS}-${GOARCH} ./...
+        go build -trimpath -ldflags "-w -s -X main.Version=${{ github.ref_name }}" -v -o ./recored-ui-${GOOS}-${GOARCH} ./...
         cp README.md LICENSE recored-ui-${GOOS}-${GOARCH}
         tar czvf recored-ui-${GOOS}-${GOARCH}.tgz recored-ui-${GOOS}-${GOARCH}
       
@@ -51,7 +51,7 @@ jobs:
       id: create_release
       uses: ncipollo/release-action@v1
       with:
-        name: Release ${{ github.ref }}
+        name: Release ${{ github.ref_name }}
 
 
     - name: Upload Release Asset Linux arm64
