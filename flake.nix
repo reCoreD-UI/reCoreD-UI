@@ -24,7 +24,6 @@
             inherit version;
 
             src = self;
-            GOPROXY = "https://goproxy.cn,direct";
 
             ldflags = [
               "-s"
