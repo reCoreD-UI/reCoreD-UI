@@ -1,0 +1,77 @@
+name: Go
+
+on:
+  push:
+    tags:
+    - 'v*.*.*'
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up NodeJS
+      uses: actions/setup-node@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.22
+
+    - name: Build Web UI
+      run: |
+        cd web
+        npm i && npm run build
+        cd ..
+        go generate ./...
+
+    - name: Build-linux-amd64
+      env:
+        GOOS: linux
+        GOARCH: amd64
+      run: |
+        mkdir -p recored-ui-${GOOS}-${GOARCH}
+        go build -trimpath -ldflags "-w -s" -v -o ./recored-ui-${GOOS}-${GOARCH} ./...
+        cp README.md LICENSE recored-ui-${GOOS}-${GOARCH}
+        tar czvf recored-ui-${GOOS}-${GOARCH}.tgz recored-ui-${GOOS}-${GOARCH}
+      
+    - name: Build-linux-arm64
+      env:
+        GOOS: linux
+        GOARCH: arm64
+      run: |
+        mkdir -p recored-ui-${GOOS}-${GOARCH}
+        go build -trimpath -ldflags "-w -s -X main.Version=${{ github.ref_name }}" -v -o ./recored-ui-${GOOS}-${GOARCH} ./...
+        cp README.md LICENSE recored-ui-${GOOS}-${GOARCH}
+        tar czvf recored-ui-${GOOS}-${GOARCH}.tgz recored-ui-${GOOS}-${GOARCH}
+      
+    - name: Create Release
+      id: create_release
+      uses: ncipollo/release-action@v1
+      with:
+        name: Release ${{ github.ref_name }}
+
+
+    - name: Upload Release Asset Linux arm64
+      id: upload-release-asset-linux-arm
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/recored-ui-linux-arm64.tgz
+        asset_name: recored-ui-linux-arm64.tgz
+        asset_content_type: application/x-gzip
+        
+    - name: Upload Release Asset Linux amd64
+      id: upload-release-asset-linux-amd64
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/recored-ui-linux-amd64.tgz
+        asset_name: recored-ui-linux-amd64.tgz
+        asset_content_type: application/x-gzip

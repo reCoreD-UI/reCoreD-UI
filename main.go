@@ -1,3 +1,26 @@
+/*
+reCoreD-UI provides web ui for CoreDNS
+
+NAME:
+reCoreD-UI - Web UI for CoreDNS
+
+USAGE:
+
+	reCoreD-UI [global options] command [command options]
+
+COMMANDS:
+
+	server   run server
+	config   config some settings
+	help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+
+	--config value, -c value  config yaml file [$RECORED_CONFIG_FILE]
+	--mysql-dsn value         mysql dsn [$RECORED_MYSQL_DSN]
+	--debug                   enable debug mode (default: false)
+	--help, -h                show help
+*/
 package main
 
 import (
@@ -11,15 +34,18 @@ import (
 	"github.com/urfave/cli/v2/altsrc"
 )
 
+// will be modified when building
+var Version string = "v0.0.1"
+
 func init() {
 	logrus.SetReportCaller(true)
 }
 
-//	@title						reCoreD-UI API
-//	@version					1.0
-//	@description				APIs for reCoreD-UI
-//	@BasePath					/api/v1
-//	@securityDefinitions.basic	BasicAuth
+// @title						reCoreD-UI API
+// @version						1.0
+// @description					APIs for reCoreD-UI
+// @BasePath					/api/v1
+// @securityDefinitions.basic	BasicAuth
 func main() {
 	flags := []cli.Flag{
 		&cli.StringFlag{
@@ -47,8 +73,9 @@ func main() {
 	}
 
 	app := &cli.App{
-		Name:  "reCoreD-UI",
-		Usage: "Web UI for CoreDNS",
+		Name:    "reCoreD-UI",
+		Version: Version,
+		Usage:   "Web UI for CoreDNS",
 		Before: altsrc.InitInputSourceWithContext(
 			flags, altsrc.NewYamlSourceFromFlagFunc("config"),
 		),

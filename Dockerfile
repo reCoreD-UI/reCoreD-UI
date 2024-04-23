@@ -6,9 +6,9 @@ RUN cd web && npm i && npm run build
 
 FROM golang as server
 WORKDIR /src
-COPY --stage web /src .
-RUN go get . && go generate ./... && go build .
+COPY --from=web /src .
+RUN go get . && go generate ./... && go build -trimpath -ldflags '-w -s -X main.Version=v1.0.0' .
 
 FROM scratch
-COPY --stage server /src/reCoreD-UI .
+COPY --from=server /src/reCoreD-UI .
 ENTRYPOINT [ '/reCoreD-UI' ]
