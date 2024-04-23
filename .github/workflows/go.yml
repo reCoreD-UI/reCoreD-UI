@@ -51,7 +51,6 @@ jobs:
       id: create_release
       uses: ncipollo/release-action@v1
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
         name: Release ${{ github.ref }}
 
 

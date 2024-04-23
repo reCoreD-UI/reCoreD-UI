@@ -8,7 +8,7 @@
     utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        name = "recored-ui";
+        name = "reCoreD-UI";
         version = "v1.0.0";
       in
       {
@@ -24,10 +24,12 @@
             inherit version;
 
             src = self;
+            GOPROXY = "https://goproxy.cn,direct";
 
             ldflags = [
               "-s"
               "-w"
+              "-X main.Version=${version}"
             ];
 
             configurePhase = ''
@@ -37,7 +39,8 @@
 
             installPhase = ''
               mkdir -p $out/bin
-              cp recored-ui $out/bin
+              ls -l
+              cp $HOME/go/bin/reCoreD-UI $out/bin
             '';
 
             doCheck = false;
@@ -50,7 +53,7 @@
           src = self;
           installPhase = ''
             mkdir -p $out/bin
-            cp ${app}/bin/recored-ui $out/bin
+            cp ${app}/bin/reCoreD-UI $out/bin
           '';
         };
 
@@ -87,12 +90,12 @@
             };
 
             config = mkIf cfg.enable {
-              systemd.services.recored-ui = {
+              systemd.services.reCoreD-UI = {
                 wantedBy = [ "multi-uesr.target" ];
                 environment = {
                   RECORED_MYSQL_DSN = cfg.mysql-dsn;
                 };
-                serviceconfig.ExecStart = "${defaultPackage}/bin/recored-ui server";
+                serviceconfig.ExecStart = "${defaultPackage}/bin/reCoreD-UI server";
               };
             };
           };
